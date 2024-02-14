@@ -1,0 +1,76 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+#chat-container {
+    max-width: 600px;
+    margin: 20px auto;
+    border: 1px solid #ddd;
+    padding: 20px;
+}
+
+#messages {
+    margin-bottom: 20px;
+    height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+#message-form {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 10px;
+}
+
+#message-input {
+    flex-grow: 1; /* Permite que o input ocupe o máximo de espaço disponível */
+    margin-right: 10px; /* Espaço entre o input e o botão de enviar */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px; /* Borda arredondada para o input */
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px; /* Borda arredondada para o botão */
+    transition: background-color 0.3s; /* Transição suave para o hover */
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#username {
+    margin-bottom: 20px;
+    padding: 10px;
+    width: calc(100% - 22px); /* Ajuste para padding e borda */
+    border: 1px solid #ccc;
+}
+
+/* Estilização para dispositivos menores */
+@media (max-width: 600px) {
+    #chat-container {
+        margin: 10px;
+        padding: 10px;
+    }
+
+    #message-form {
+        flex-direction: column;
+    }
+
+    #message-input {
+        margin-bottom: 10px;
+        flex-grow: 0;
+    }
+
+    button {
+        width: 100%;
+    }
+}

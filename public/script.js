@@ -1,3 +1,6 @@
+const socket = io(); // Inicia a conexão WebSocket com o servidor
+
+
 document.addEventListener('DOMContentLoaded', function() {
     const usernameInput = document.getElementById('username');
     const messageForm = document.getElementById('message-form');
@@ -30,10 +33,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Exibe a mensagem na interface
+    // Modifiquei a função displayMessage para incluir o envio de mensagens com Socket.io
     function displayMessage(user, message) {
-        const messageElement = document.createElement('div');
-        messageElement.textContent = `${user}: ${message}`;
-        messagesContainer.appendChild(messageElement);
+        socket.emit('chat message', `${user}: ${message}`);
     }
+
+    // Ouça mensagens de 'chat message' vindas do servidor e as exiba
+    socket.on('chat message', function(msg) {
+        const messageElement = document.createElement('div');
+        messageElement.textContent = msg;
+        messagesContainer.appendChild(messageElement);
+    });
+
 });

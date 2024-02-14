@@ -9,18 +9,18 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 // Substitua 'your_mongodb_connection_string' pela sua string de conexão do MongoDB
-mongoose.connect('your_mongodb_connection_string', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect('mongodb://localhost:27017/messages');
 
 const PORT = 3000;
 app.use(express.static('public'));
 
-io.on('connection', (socket) => {
-    // Quando um usuário se conecta, envie o histórico de mensagens
-    Message.find().sort('timestamp').limit(100).exec((err, messages) => {
-        if (!err) {
-            socket.emit('init', messages);
-        }
-    });
+io.on('connection', async (socket) => {
+    try {
+        const messages = await Message.find().sort('timestamp').limit(100).exec();
+        socket.emit('init', messages);
+    } catch (err) {
+        console.error(err);
+    }
 
     socket.on('chat message', (data) => {
         // Salva a mensagem no banco de dados

@@ -33,10 +33,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Modifiquei a função displayMessage para incluir o envio de mensagens com Socket.io
-    function displayMessage(user, message) {
-        socket.emit('chat message', `${user}: ${message}`);
+    // Modifiquei a função displayMessage para enviar um objeto ao invés de uma string
+    function displayMessage(message) {
+        socket.emit('chat message', { username: username, message: message });
     }
+
 
     // Ouça mensagens de 'chat message' vindas do servidor e as exiba
     socket.on('chat message', function(msg) {
@@ -44,5 +45,12 @@ document.addEventListener('DOMContentLoaded', function() {
         messageElement.textContent = msg;
         messagesContainer.appendChild(messageElement);
     });
+
+    socket.on('init', function(messages) {
+        messages.forEach(function(message) {
+            displayMessage(message); // Adapte conforme necessário para exibir corretamente
+        });
+    });
+    
 
 });

@@ -12,11 +12,17 @@ app.use(express.static('public'));
 
 io.on('connection', (socket) => {
     console.log('Novo usuário conectado');
+    socket.broadcast.emit('chat message', 'Um novo usuário se juntou ao chat!');
 
     socket.on('chat message', (msg) => {
-        io.emit('chat message', msg); // Envia a mensagem para todos os usuários conectados
+        io.emit('chat message', msg);
+    });
+
+    socket.on('disconnect', () => {
+        io.emit('chat message', 'Um usuário saiu do chat.');
     });
 });
+
 
 server.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);

@@ -28,27 +28,30 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault(); // Evita o recarregamento da página
         const message = messageInput.value.trim();
         if (message && username) {
-            displayMessage(username, message);
+            // Emita a mensagem para o servidor
+            socket.emit('chat message', { username: username, message: message });
             messageInput.value = ''; // Limpa o campo de entrada
         }
     });
 
-    // Modifiquei a função displayMessage para enviar um objeto ao invés de uma string
-    function displayMessage(message) {
-        socket.emit('chat message', { username: username, message: message });
+    // Esta função precisa ser atualizada para lidar com objetos de mensagem
+    function displayMessage(data) {
+        const { username, message } = data; // Desestruturação do objeto
+        const messageElement = document.createElement('div');
+        messageElement.textContent = `${username}: ${message}`; // Combina o nome de usuário e a mensagem
+        messagesContainer.appendChild(messageElement);
     }
 
-
-    // Ouça mensagens de 'chat message' vindas do servidor e as exiba
-    socket.on('chat message', function(msg) {
-        const messageElement = document.createElement('div');
-        messageElement.textContent = msg;
-        messagesContainer.appendChild(messageElement);
+    // Atualize o ouvinte para 'chat message' para usar a função displayMessage corrigida
+    socket.on('chat message', function(data) {
+        displayMessage(data);
     });
 
+    // Ouvinte para 'init' com o histórico de mensagens
     socket.on('init', function(messages) {
         messages.forEach(function(message) {
-            displayMessage(message); // Adapte conforme necessário para exibir corretamente
+            // Supondo que 'message' é um objeto com as propriedades 'username' e 'message'
+            displayMessage(message);
         });
     });
     

@@ -54,6 +54,14 @@ button:hover {
     border: 1px solid #ccc;
 }
 
+#emoji-button {
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    font-size: 24px;
+}
+
+
 /* Estilização para dispositivos menores */
 @media (max-width: 600px) {
     #chat-container {

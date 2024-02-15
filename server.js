@@ -15,19 +15,26 @@ const PORT = 3000;
 app.use(express.static('public'));
 
 io.on('connection', async (socket) => {
+    // Enviar mensagens anteriores
     try {
-        const messages = await Message.find().sort('timestamp').limit(100).exec();
+        const messages = await Message.find().sort({ timestamp: 1 }).limit(100); // Removido .exec() que é redundante aqui
         socket.emit('init', messages);
     } catch (err) {
         console.error(err);
     }
 
-    socket.on('chat message', (data) => {
-        // Salva a mensagem no banco de dados
-        const newMessage = new Message({ username: data.username, message: data.message });
-        newMessage.save();
-
-        io.emit('chat message', data);
+    // Ouvinte para novas mensagens
+    socket.on('chat message', async (data) => {
+        try {
+            // Salva a mensagem no banco de dados
+            const newMessage = new Message({ username: data.username, message: data.message });
+            const savedMessage = await newMessage.save();
+            
+            // Emita a mensagem salva para todos os clientes
+            io.emit('chat message', savedMessage);
+        } catch (err) {
+            console.error('Erro ao salvar a mensagem:', err);
+        }
     });
 });
 

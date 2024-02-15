@@ -9,18 +9,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let username = '';
 
-    // Solicita o nome de usuário
+
+
+    // Função para definir o nome de usuário
+    function setUsername() {
+        username = usernameInput.value.trim();
+        if (username) {
+            usernameInput.style.display = 'none'; // Esconde o campo de nome de usuário
+            document.getElementById('set-username-btn').style.display = 'none'; // Esconde o botão de definir nome de usuário
+            messageInput.focus(); // Move o foco para o campo de entrada de mensagem
+        } else {
+            alert('Por favor, insira um nome de usuário válido.');
+        }
+    }
+
+    // Solicita o nome de usuário quando Enter é pressionado
     usernameInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault(); // Evita o envio do formulário
-            username = usernameInput.value.trim();
-            if (username) {
-                usernameInput.style.display = 'none'; // Esconde o campo de nome de usuário
-                messageInput.focus(); // Move o foco para o campo de entrada de mensagem
-            } else {
-                alert('Por favor, insira um nome de usuário válido.');
-            }
+            setUsername();
         }
+    });
+
+    // Adiciona um ouvinte de evento ao botão de definir nome de usuário
+    document.getElementById('set-username-btn').addEventListener('click', function() {
+        setUsername();
     });
 
     // Envia a mensagem

@@ -1,3 +1,6 @@
+// Adicione esta linha no topo do seu arquivo script.js
+import { EmojiButton } from 'https://unpkg.com/@joeattardi/emoji-button@latest';
+
 const socket = io(); // Inicia a conexão WebSocket com o servidor
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -7,6 +10,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const messageForm = document.getElementById('message-form');
     const messageInput = document.getElementById('message-input');
     const messagesContainer = document.getElementById('messages');
+
+
+    const emojiButton = document.querySelector('#emoji-button');
+    const picker = new EmojiButton();
+
+    picker.on('emoji', emojiObject => {
+        const emojiString = emojiObject.emoji; 
+        document.querySelector('#message-input').value += emojiString;
+    });
+
+    emojiButton.addEventListener('click', () => picker.togglePicker(emojiButton));
+
 
     let username = localStorage.getItem('username') || '';
 

@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
         username = usernameInput.value.trim();
         if (username) {
             localStorage.setItem('username', username); // Armazena o nome de usuário no localStorage
+            socket.emit('set username', username); // Notify the server of the new username
             usernameInput.style.display = 'none';
             setUsernameBtn.style.display = 'none';
             logoutBtn.style.display = 'block';
@@ -59,13 +60,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Adiciona um ouvinte de evento ao botão de definir nome de usuário
     setUsernameBtn.addEventListener('click', function () {
         setUsername();
+        // socket.emit('set username', username);
         window.location.reload();
-
     });
 
 
     // Adiciona um ouvinte de evento ao botão de sair
     logoutBtn.addEventListener('click', function() {
+        socket.emit('logout', username); // Optionally notify the server that the user is logging ou
         localStorage.removeItem('username'); // Remove o nome de usuário do localStorage
         window.location.reload(); // Recarrega a página para redefinir o estado
     });
@@ -82,10 +84,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Função para exibir mensagens
     function displayMessage(data) {
-        const { username, message } = data; // Desestruturação do objeto
+        const { username, message, type } = data;
         const messageElement = document.createElement('div');
-        messageElement.textContent = `${username}: ${message}`;
+        if (type === 'info') {
+            messageElement.innerHTML = `<em>${message}</em>`;
+            messageElement.style.color = 'grey'; // Styling for info messages
+        } else {
+            messageElement.textContent = `${username}: ${message}`;
+        }
         messagesContainer.appendChild(messageElement);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight; // Auto-scroll to latest message
     }
 
     // Ouvinte para mensagens
@@ -95,4 +103,15 @@ document.addEventListener('DOMContentLoaded', function() {
     socket.on('init', function(messages) {
         messages.forEach(displayMessage);
     });
+
+    socket.on('user joined', function(message) {
+        displayMessage({ message: message, type: 'info' });
+    });
+    
+    socket.on('user left', function(message) {
+        displayMessage({ message: message, type: 'info' });
+    });
+
+
+
 });

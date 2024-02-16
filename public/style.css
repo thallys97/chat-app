@@ -83,3 +83,11 @@ button:hover {
         width: 100%;
     }
 }
+
+
+/* ... other styles ... */
+
+em {
+    color: #555;
+    font-style: normal;
+}

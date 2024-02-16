@@ -11,10 +11,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const messageInput = document.getElementById('message-input');
     const messagesContainer = document.getElementById('messages');
 
-
+    
     const emojiButton = document.querySelector('#emoji-button');
     const picker = new EmojiButton();
 
+    
     picker.on('emoji', emojiObject => {
         const emojiString = emojiObject.emoji; 
         document.querySelector('#message-input').value += emojiString;
@@ -25,12 +26,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let username = localStorage.getItem('username') || '';
 
+
     if (username) {
+        // Se o nome de usuário estiver definido, mostra o form e o botão de emoji
+        messageForm.style.display = 'block';
+        emojiButton.style.display = 'inline-block'; // ou 'block', dependendo do seu layout
         usernameInput.style.display = 'none';
         setUsernameBtn.style.display = 'none';
         logoutBtn.style.display = 'block';
         messageInput.focus();
     } else {
+        // Se o nome de usuário não estiver definido, esconde o form e o botão de emoji
+        messageForm.style.display = 'none';
+        emojiButton.style.display = 'none';
         logoutBtn.style.display = 'none';
     }
 
@@ -49,7 +57,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Adiciona um ouvinte de evento ao botão de definir nome de usuário
-    setUsernameBtn.addEventListener('click', setUsername);
+    setUsernameBtn.addEventListener('click', function () {
+        setUsername();
+        window.location.reload();
+
+    });
+
 
     // Adiciona um ouvinte de evento ao botão de sair
     logoutBtn.addEventListener('click', function() {

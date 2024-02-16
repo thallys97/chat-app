@@ -20,8 +20,8 @@ body, html {
 }
 
 #message-form {
-    display: flex;
-    justify-content: space-between;
+    display: none;
+    /* justify-content: space-between; */
     padding-top: 10px;
 }
 
@@ -55,6 +55,7 @@ button:hover {
 }
 
 #emoji-button {
+    display: none;
     cursor: pointer;
     border: none;
     background-color: transparent;

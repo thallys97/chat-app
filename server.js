@@ -36,6 +36,51 @@ io.on('connection', async (socket) => {
             console.error('Erro ao salvar a mensagem:', err);
         }
     });
+
+    socket.on('set username', async (username) => {
+        socket.username = username; // Armazena o nome de usuário na sessão do socket
+        const joinMessage = new Message({
+            username: 'System',
+            message: `${username} has entered the chat`,
+            type: 'info'
+        });
+        await joinMessage.save();
+        io.emit('chat message', joinMessage);
+    });
+
+
+    socket.on('logout', async (username) => {
+        socket.username = username;
+        //socket.isLogoutIntentional = true; // Define a flag para logout intencional
+
+        const leftMessage = new Message({
+            username: 'System',
+            message: `${username} has left the chat`,
+            type: 'info'
+        });
+        await leftMessage.save();
+        io.emit('chat message', leftMessage);
+    });
+
+    // socket.on('disconnect', async () => {
+    //     if (socket.isLogoutIntentional) {
+    //         // Se a desconexão foi intencional, não faz nada, pois a mensagem de saída já foi emitida
+    //         socket.isLogoutIntentional = false; // Reseta a flag
+    //     } else {
+    //         // Trata desconexões que não são causadas por logout intencional
+    //         if (socket.username) {
+    //             const leftMessage = new Message({
+    //                 username: 'System',
+    //                 message: `${socket.username} has left the chat unexpectedly`,
+    //                 type: 'info'
+    //             });
+    //             await leftMessage.save();
+    //             io.emit('chat message', leftMessage);
+    //         }
+    //     }
+    // });
+    
+
 });
 
 server.listen(PORT, () => {

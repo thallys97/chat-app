@@ -133,9 +133,18 @@ document.addEventListener('DOMContentLoaded', function() {
             messageElement.appendChild(infoElement);
             
         } else if (data.type === 'image') {
+
+            console.log(data);
+
+            // Exibir o nome do usuário
+            const usernameImageElement = document.createElement('p');
+            usernameImageElement.textContent = `${data.username}:`;
+            messageElement.appendChild(usernameImageElement);
+
             // Exibir a imagem
             const imageElement = document.createElement('img');
-            imageElement.src = data.file;
+            imageElement.classList.add('message-file');
+            imageElement.src = data.image;
             imageElement.alt = 'Imagem enviada';
             messageElement.appendChild(imageElement);
         } else if (data.type === 'video') {

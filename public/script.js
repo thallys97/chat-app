@@ -72,33 +72,99 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.reload(); // Recarrega a página para redefinir o estado
     });
 
-    // Envia a mensagem
+
+    // Função para fazer upload de arquivos
+    async function uploadFile(file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch('/upload', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error('Falha ao fazer upload do arquivo');
+        }
+
+        return response.json();
+    }
+
+
+
+    // Envia a mensagem e arquivos
     messageForm.addEventListener('submit', function(e) {
-        e.preventDefault(); // Evita o recarregamento da página
-        const message = messageInput.value.trim();
-        if (message && username) {
-            socket.emit('chat message', { username: username, message: message });
-            messageInput.value = ''; // Limpa o campo de entrada
+        e.preventDefault();
+    
+        const messageText = messageInput.value.trim();
+        const file = document.getElementById('file-input').files[0];
+    
+        if (messageText && username) {
+            // Se houver texto, envia uma mensagem de texto
+            socket.emit('chat message', { username: username, text: messageText });
+            messageInput.value = '';
+        } else if (file) {
+            // Se houver um arquivo, você precisa fazer upload para um servidor ou serviço de armazenamento de arquivos
+            // Depois de fazer upload do arquivo e obter a URL, você pode enviar essa URL como uma mensagem
+            uploadFile(file).then(response => {
+                const url = response.url;
+                socket.emit('chat message', { username: username, file: url, type: file.type.startsWith('image/') ? 'image' : 'video' });
+                messageInput.value = '';
+                document.getElementById('file-input').value = ''; // Limpar o campo de arquivo
+            }).catch(error => {
+                console.error('Falha ao enviar arquivo', error);
+            });
         }
     });
 
     // Função para exibir mensagens
-    function displayMessage(data) {
-        const { username, message, type } = data;
+    function displayMessage(data) {  
+
         const messageElement = document.createElement('div');
-        if (type === 'info') {
-            messageElement.innerHTML = `<em>${message}</em>`;
-            messageElement.style.color = 'grey'; // Styling for info messages
+    
+        if (data.type === 'info') {
+
+            // console.log(data.username + ":" + data.text);
+
+            // Estiliza e exibe mensagens do sistema
+            const infoElement = document.createElement('p');
+            infoElement.innerHTML = `<em>${data.text}</em>`;
+            infoElement.style.color = 'grey';
+            messageElement.appendChild(infoElement);
+            
+        } else if (data.type === 'image') {
+            // Exibir a imagem
+            const imageElement = document.createElement('img');
+            imageElement.src = data.file;
+            imageElement.alt = 'Imagem enviada';
+            messageElement.appendChild(imageElement);
+        } else if (data.type === 'video') {
+            // Exibir o vídeo
+            const videoElement = document.createElement('video');
+            videoElement.src = data.file;
+            videoElement.controls = true;
+            messageElement.appendChild(videoElement);
+        } else if (data.type === 'link') {
+            // Exibir o link
+            const linkElement = document.createElement('a');
+            linkElement.href = data.message; // Supondo que `data.message` contém a URL
+            linkElement.textContent = data.message;
+            linkElement.target = "_blank";
+            messageElement.appendChild(linkElement);
         } else {
-            messageElement.textContent = `${username}: ${message}`;
+            // Exibir mensagem de texto
+            messageElement.textContent = `${data.username}: ${data.text}`;
         }
+    
         messagesContainer.appendChild(messageElement);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight; // Auto-scroll to latest message
+        messagesContainer.scrollTop = messagesContainer.scrollHeight; // Auto-scroll para a mensagem mais recente
     }
 
     // Ouvinte para mensagens
-    socket.on('chat message', displayMessage);
+    socket.on('chat message', function(message) {
 
+        displayMessage(message);
+    });
     // Ouvinte para histórico de mensagens
     socket.on('init', function(messages) {
         messages.forEach(displayMessage);
@@ -111,6 +177,15 @@ document.addEventListener('DOMContentLoaded', function() {
     socket.on('user left', function(message) {
         displayMessage({ message: message, type: 'info' });
     });
+
+    
+    // socket.on('set username', function(message) {
+    //     socket.emit('chat message', message);
+    // });
+    
+    // socket.on('user left', function(message) {
+    //     displayMessage({ message: message, type: 'info' });
+    // });
 
 
 

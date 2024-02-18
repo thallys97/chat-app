@@ -3,6 +3,8 @@ const http = require('http');
 const socketIo = require('socket.io');
 const mongoose = require('mongoose');
 const Message = require('./messageModel'); // Importa o modelo de mensagem
+const multer = require('multer');
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
@@ -12,40 +14,111 @@ const io = socketIo(server);
 mongoose.connect('mongodb://localhost:27017/messages');
 
 const PORT = 3000;
+
 app.use(express.static('public'));
+
+// Configure o Multer e o local de armazenamento dos arquivos
+const storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, 'uploads/'); // Certifique-se de que este diretório exista
+    },
+    filename: function(req, file, cb) {
+        cb(null, Date.now() + path.extname(file.originalname)); // Nomeando o arquivo
+    }
+});
+
+const upload = multer({ storage: storage });
+
+// Rota de upload
+app.post('/upload', upload.single('file'), (req, res) => {
+    if (req.file) {
+        const url = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+        res.json({ url: url });
+    } else {
+        res.status(400).send('Nenhum arquivo foi enviado.');
+    }
+});
+
+
+// Servir arquivos estáticos da pasta uploads
+app.use('/uploads', express.static('uploads'));
+
+
 
 io.on('connection', async (socket) => {
     // Enviar mensagens anteriores
     try {
-        const messages = await Message.find().sort({ timestamp: 1 }).limit(100); // Removido .exec() que é redundante aqui
-        socket.emit('init', messages);
+        // Encontre as 100 mensagens mais recentes e ordene-as do mais novo para o mais antigo
+        const messages = await Message.find().sort({ timestamp: -1 }).limit(100);
+        // Reverter a ordem das mensagens para que a mais antiga apareça primeiro
+        socket.emit('init', messages.reverse());
     } catch (err) {
         console.error(err);
     }
 
     // Ouvinte para novas mensagens
     socket.on('chat message', async (data) => {
+        
+        socket.username = data.username;
+        
+        
         try {
-            // Salva a mensagem no banco de dados
-            const newMessage = new Message({ username: data.username, message: data.message });
-            const savedMessage = await newMessage.save();
+            let messageData = {
+                username: data.username,
+                timestamp: new Date(),
+            };
+    
+            if (data.text) {
+                messageData.text = data.text; // Mensagem de texto
+            }  
             
-            // Emita a mensagem salva para todos os clientes
+            if (data.type === 'info') {  
+                messageData.text = data.text; // Mensagem do sistema
+                messageData.type = 'info';
+            } 
+            
+            if (data.file && data.type === 'image') {
+                messageData.image = data.file; // URL da imagem
+                messageData.type = 'image';
+            } 
+            
+            if (data.file && data.type === 'video') {
+                messageData.video = data.file; // URL do vídeo
+                messageData.type = 'video';
+            }  
+            
+            if (data.type === 'link') {
+                messageData.link = data.text; // URL do vídeo
+                messageData.type = 'link';
+            }    
+
+    
+            const newMessage = new Message(messageData);
+            const savedMessage = await newMessage.save();
+
+            //console.log(savedMessage)
+
             io.emit('chat message', savedMessage);
         } catch (err) {
             console.error('Erro ao salvar a mensagem:', err);
         }
     });
+    
 
     socket.on('set username', async (username) => {
         socket.username = username; // Armazena o nome de usuário na sessão do socket
         const joinMessage = new Message({
             username: 'System',
-            message: `${username} has entered the chat`,
+            text: `${username} has entered the chat`,
             type: 'info'
         });
+
+        
+
         await joinMessage.save();
         io.emit('chat message', joinMessage);
+
+        // console.log(joinMessage);
     });
 
 
@@ -55,7 +128,7 @@ io.on('connection', async (socket) => {
 
         const leftMessage = new Message({
             username: 'System',
-            message: `${username} has left the chat`,
+            text: `${username} has left the chat`,
             type: 'info'
         });
         await leftMessage.save();

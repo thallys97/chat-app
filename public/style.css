@@ -63,6 +63,15 @@ button:hover {
 }
 
 
+/* imagens, vídeos e links */
+
+.message-file {
+    width: 90%;
+    
+}
+
+
+
 /* Estilização para dispositivos menores */
 @media (max-width: 600px) {
     #chat-container {
@@ -82,6 +91,11 @@ button:hover {
     button {
         width: 100%;
     }
+
+    .message-file {
+        width: 100%;    
+    }
+
 }
 
 

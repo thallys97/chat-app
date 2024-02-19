@@ -14,7 +14,10 @@
         <div id="messages"></div>
         <form id="message-form">
             <input type="text" id="message-input" placeholder="Digite uma mensagem" />
-            <input type="file" id="file-input" accept="image/*, video/*" /> <!-- Input para arquivos -->
+            <div>
+                <input type="file" id="file-input" accept="image/*, video/*" /> <!-- Input para arquivos -->
+                <small id="file-size-info">Tamanho máximo: 20 MB</small>
+            </div>
             <button type="submit">Enviar</button>
         </form>
         <button id="emoji-button">😊</button>

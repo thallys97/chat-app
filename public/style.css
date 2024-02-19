@@ -33,6 +33,14 @@ body, html {
     border-radius: 4px; /* Borda arredondada para o input */
 }
 
+#file-size-info {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+
 button {
     padding: 10px 15px;
     border: none;

@@ -139,6 +139,29 @@ io.on('connection', async (socket) => {
         io.emit('chat message', leftMessage);
     });
 
+
+        // Ouvinte para mensagens privadas
+        socket.on('private message', (data) => {
+            // 'data' deve incluir 'senderID', 'receiverID' e 'text'
+            const { senderID, receiverID, text } = data;
+            const newMessage = new Message({
+                senderID,
+                receiverID,
+                text,
+                type: 'private'
+                // ... outras propriedades ...
+            });
+            // Salva a mensagem privada no banco de dados
+            newMessage.save();
+    
+            // Envia a mensagem para o socket específico do receptor usando 'receiverID'
+            const receiverSocket = io.sockets.connected[receiverID];
+            if (receiverSocket) {
+            receiverSocket.emit('private message', newMessage);
+            }
+        });
+    
+
     // socket.on('disconnect', async () => {
     //     if (socket.isLogoutIntentional) {
     //         // Se a desconexão foi intencional, não faz nada, pois a mensagem de saída já foi emitida

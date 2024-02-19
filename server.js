@@ -27,7 +27,11 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ 
+    storage: storage,
+    limits: { fileSize: 20 * 1024 * 1024 } // 20 MB
+});
+
 
 // Rota de upload
 app.post('/upload', upload.single('file'), (req, res) => {

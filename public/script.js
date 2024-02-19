@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (username) {
         // Se o nome de usuário estiver definido, mostra o form e o botão de emoji
-        messageForm.style.display = 'block';
+        messageForm.style.display = 'flex';
         emojiButton.style.display = 'inline-block'; // ou 'block', dependendo do seu layout
         usernameInput.style.display = 'none';
         setUsernameBtn.style.display = 'none';
@@ -75,6 +75,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Função para fazer upload de arquivos
     async function uploadFile(file) {
+
+        if(file.size > 20 * 1024 * 1024) { // Se o arquivo for maior que 20 MB
+            alert('O arquivo é muito grande. O tamanho máximo permitido é de 20 MB.');
+            return;
+        }
+
         const formData = new FormData();
         formData.append('file', file);
 
@@ -134,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
         } else if (data.type === 'image') {
 
-            console.log(data);
+            // console.log(data);
 
             // Exibir o nome do usuário
             const usernameImageElement = document.createElement('p');
@@ -148,9 +154,19 @@ document.addEventListener('DOMContentLoaded', function() {
             imageElement.alt = 'Imagem enviada';
             messageElement.appendChild(imageElement);
         } else if (data.type === 'video') {
+
+            // console.log(data);
+
+            // Exibir o nome do usuário
+            const usernameVideoElement = document.createElement('p');
+            usernameVideoElement.textContent = `${data.username}:`;
+            messageElement.appendChild(usernameVideoElement);
+
             // Exibir o vídeo
             const videoElement = document.createElement('video');
-            videoElement.src = data.file;
+            videoElement.classList.add('message-file');
+            videoElement.src = data.video;
+            videoElement.alt = 'Video enviado';
             videoElement.controls = true;
             messageElement.appendChild(videoElement);
         } else if (data.type === 'link') {

@@ -7,7 +7,9 @@ const messageSchema = new mongoose.Schema({
     video: String, // URL do vídeo
     link: String, // URL do link
     type: { type: String, default: 'regular' }, // Tipo de mensagem: 'regular', 'info', 'image', 'video', 'link'
-    timestamp: { type: Date, default: Date.now }
+    timestamp: { type: Date, default: Date.now },
+    senderID: String, // ID do usuário que envia a mensagem
+    receiverID: String, // ID do usuário que recebe a mensagem (se for uma mensagem privada)
 });
 
 

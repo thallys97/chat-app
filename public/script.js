@@ -123,8 +123,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Função para verificar se a mensagem contém um link e transformá-lo em um elemento clicável
+    function createLinkElement(text) {
+        // Regex para identificar URLs na mensagem
+        const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+        // Substitui todas as ocorrências de URLs por um elemento âncora
+        return text.replace(urlRegex, function(url) {
+            return `<a href="${url}" target="_blank">${url}</a>`;
+        });
+    }
+
     // Função para exibir mensagens
     function displayMessage(data) {  
+
+        console.log(data);
 
         const messageElement = document.createElement('div');
     
@@ -177,8 +189,12 @@ document.addEventListener('DOMContentLoaded', function() {
             linkElement.target = "_blank";
             messageElement.appendChild(linkElement);
         } else {
-            // Exibir mensagem de texto
-            messageElement.textContent = `${data.username}: ${data.text}`;
+           
+            // Verifica se a mensagem contém uma URL
+            const messageWithLink = createLinkElement(data.text);
+
+             // Exibir mensagem de texto
+            messageElement.innerHTML = `${data.username}: ${messageWithLink}`;
         }
     
         messagesContainer.appendChild(messageElement);

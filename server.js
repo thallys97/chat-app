@@ -5,6 +5,11 @@ const mongoose = require('mongoose');
 const Message = require('./messageModel'); // Importa o modelo de mensagem
 const multer = require('multer');
 const path = require('path');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
+
+require('dotenv').config();
 
 const app = express();
 const server = http.createServer(app);
@@ -16,6 +21,72 @@ mongoose.connect('mongodb://localhost:27017/messages');
 const PORT = 3000;
 
 app.use(express.static('public'));
+
+
+app.use(express.json());
+app.use(cookieParser());
+
+// Rota de registro
+
+app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+
+
+app.post('/register', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        const user = new User({ username, password });
+        await user.save();
+        res.status(201).send('Usuário registrado com sucesso!');
+    } catch (error) {
+        res.status(500).send('Erro ao registrar usuário.');
+    }
+});
+
+// Rota de login
+
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+
+
+app.post('/login', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        const user = await User.findOne({ username });
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            return res.status(401).send('Credenciais inválidas.');
+        }
+        const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+        res.cookie('token', token, { httpOnly: true });
+        res.status(200).send('Login bem-sucedido!');
+    } catch (error) {
+        res.status(500).send('Erro ao fazer login.');
+    }
+});
+
+const withAuth = (req, res, next) => {
+    try {
+        const token = req.cookies.token;
+        if (!token) {
+            return res.status(401).send('Não autorizado: Nenhum token fornecido.');
+        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.userID = decoded.userID;
+        next();
+    } catch (error) {
+        res.status(401).send('Não autorizado: Token inválido.');
+    }
+};
+
+// Use o middleware 'withAuth' nas rotas que você deseja proteger
+app.use('/protected-route', withAuth, (req, res) => {
+    res.send('Esta rota está protegida.');
+});
+
+
 
 // Configure o Multer e o local de armazenamento dos arquivos
 const storage = multer.diskStorage({
@@ -42,7 +113,6 @@ app.post('/upload', upload.single('file'), (req, res) => {
         res.status(400).send('Nenhum arquivo foi enviado.');
     }
 });
-
 
 // Servir arquivos estáticos da pasta uploads
 app.use('/uploads', express.static('uploads'));
@@ -142,24 +212,41 @@ io.on('connection', async (socket) => {
 
         // Ouvinte para mensagens privadas
         socket.on('private message', (data) => {
-            // 'data' deve incluir 'senderID', 'receiverID' e 'text'
-            const { senderID, receiverID, text } = data;
+            // 'data' deve incluir 'text' e 'receiverID'
+            const { receiverID, text } = data;
             const newMessage = new Message({
-                senderID,
+                senderID: socket.userID, // O ID do remetente agora é obtido pelo token
                 receiverID,
                 text,
                 type: 'private'
-                // ... outras propriedades ...
             });
-            // Salva a mensagem privada no banco de dados
             newMessage.save();
-    
-            // Envia a mensagem para o socket específico do receptor usando 'receiverID'
+            
+            // Envia a mensagem para o socket específico do receptor
             const receiverSocket = io.sockets.connected[receiverID];
             if (receiverSocket) {
-            receiverSocket.emit('private message', newMessage);
+                receiverSocket.emit('private message', newMessage);
+            } else {
+                socket.emit('error', 'Usuário não encontrado.');
             }
         });
+
+     // Middleware para verificar o token do socket
+    socket.use(([event, data], next) => {
+        if (event === 'private message') {
+            try {
+                const token = data.token;
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                socket.userID = decoded.userID;   
+                next();
+            } catch (error) {
+                next(new Error('Não autorizado: Token inválido.'));
+            }
+        } else {
+            next();
+        }      
+    });   
+
     
 
     // socket.on('disconnect', async () => {

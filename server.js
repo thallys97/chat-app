@@ -3,11 +3,13 @@ const http = require('http');
 const socketIo = require('socket.io');
 const mongoose = require('mongoose');
 const Message = require('./messageModel'); // Importa o modelo de mensagem
+const User = require('./userModel');
 const multer = require('multer');
 const path = require('path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const { Console } = require('console');
 
 require('dotenv').config();
 
@@ -19,6 +21,22 @@ const io = socketIo(server);
 mongoose.connect('mongodb://localhost:27017/messages');
 
 const PORT = 3000;
+
+const withAuth = (req, res, next) => {
+    try {
+        const tokenHeader = req.headers['authorization'];
+        const token = tokenHeader && tokenHeader.split(' ')[1]; // Bearer TOKEN
+        if (!token) {
+            return res.status(401).send('Não autorizado: Nenhum token fornecido.');
+        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.userID = decoded.userID;
+        next();
+    } catch (error) {
+        res.status(401).send('Não autorizado: Token inválido.');
+    }
+};
+
 
 app.use(express.static('public'));
 
@@ -33,14 +51,35 @@ app.get('/register', (req, res) => {
 });
 
 
+// Adaptação da rota de registro para logar o usuário imediatamente após o registro
 app.post('/register', async (req, res) => {
     try {
         const { username, password } = req.body;
-        const user = new User({ username, password });
+        // Verifica se o usuário já existe
+        let user = await User.findOne({ username });
+        if (user) {
+            return res.status(400).send('Usuário já existe.');
+        }
+
+        user = new User({ username, password });
         await user.save();
-        res.status(201).send('Usuário registrado com sucesso!');
+
+        // Loga o usuário e retorna um token
+        const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+        res.json({ token }); // Envia o token para o cliente
+
+        // Emita uma mensagem de boas-vindas no chat
+        const joinMessage = new Message({
+            username: 'System',
+            text: `${username} has joined the chat`,
+            type: 'info'
+        });
+        await joinMessage.save();
+        io.emit('chat message', joinMessage);
+
     } catch (error) {
-        res.status(500).send('Erro ao registrar usuário.');
+        console.error(error);
+        res.status(500).send('Erro no servidor.');
     }
 });
 
@@ -52,6 +91,7 @@ app.get('/login', (req, res) => {
 
 
 
+// Rota de login
 app.post('/login', async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -59,27 +99,57 @@ app.post('/login', async (req, res) => {
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(401).send('Credenciais inválidas.');
         }
+
         const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
-        res.cookie('token', token, { httpOnly: true });
-        res.status(200).send('Login bem-sucedido!');
+        res.json({ token }); // Envie o token como JSON
+
+        // Emita uma mensagem no chat indicando que o usuário entrou
+        const joinMessage = new Message({
+            username: 'System',
+            text: `${username} has joined the chat`,
+            type: 'info'
+        });
+        await joinMessage.save();
+        io.emit('chat message', joinMessage);
+
     } catch (error) {
+        console.error('Erro ao fazer login:', error);
         res.status(500).send('Erro ao fazer login.');
     }
 });
 
-const withAuth = (req, res, next) => {
+
+
+// Rota de logout
+app.post('/logout', withAuth, async (req, res) => {
+    // A função withAuth já preenche req.userID se o token for válido
     try {
-        const token = req.cookies.token;
-        if (!token) {
-            return res.status(401).send('Não autorizado: Nenhum token fornecido.');
+        // Busca o usuário pelo ID para obter o nome de usuário
+        const user = await User.findById(req.userID);
+        if (!user) {
+            return res.status(400).send('Usuário não encontrado.');
         }
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.userID = decoded.userID;
-        next();
+
+        // Limpa o cookie com o token JWT
+        res.clearCookie('token');
+        res.status(200).send('Logout bem-sucedido.');
+
+        // Notifica todos os usuários que o usuário saiu
+        const leftMessage = new Message({
+            username: 'System',
+            text: `${user.username} has left the chat`,
+            type: 'info'
+        });
+        await leftMessage.save();
+        io.emit('chat message', leftMessage);
     } catch (error) {
-        res.status(401).send('Não autorizado: Token inválido.');
+        console.error('Erro ao processar o logout:', error);
+        res.status(500).send('Erro interno do servidor.');
     }
-};
+});
+
+
+
 
 // Use o middleware 'withAuth' nas rotas que você deseja proteger
 app.use('/protected-route', withAuth, (req, res) => {
@@ -130,17 +200,76 @@ io.on('connection', async (socket) => {
         console.error(err);
     }
 
+
+         // Middleware para verificar o token do socket
+         socket.use(async ([event, data], next) => {
+
+            if (event === 'authenticate') { // Supondo que 'authenticate' é um novo evento para autenticação
+                try {
+                    const token = data.token;
+                    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                    const user = await User.findById(decoded.userID);
+                    if (!user) {
+                        return next(new Error('Usuário não encontrado.'));
+                    }
+                    socket.username = user.username;   // Armazena o nome de usuário no objeto socket
+                    next();
+                } catch (error) {
+                    next(new Error('Não autorizado: Token inválido.'));
+                }
+            } else {
+                if (!socket.username) {
+                    next(new Error('Não autorizado: Usuário não autenticado.'));
+                } else {
+                    next();
+                }
+            }
+    
+            if (event === 'private message') {
+                try {
+                    const token = data.token;
+                    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                    socket.userID = decoded.userID;   
+                    next();
+                } catch (error) {
+                    next(new Error('Não autorizado: Token inválido.'));
+                }
+            } else {
+                next();
+            }      
+        }); 
+        
+        
+        socket.on('authenticate', async (data) => {
+            try {
+              const token = data.token;
+              const decoded = jwt.verify(token, process.env.JWT_SECRET);
+              const user = await User.findById(decoded.userID);
+              if (!user) {
+                return socket.emit('error', 'Usuário não encontrado.');
+              }
+          
+              socket.username = user.username; // Armazena o nome de usuário no objeto socket
+          
+              // Envia um evento 'authenticated' de volta para o cliente
+              socket.emit('authenticated', { username: user.username });
+          
+              // Restante do código...
+            } catch (error) {
+              socket.emit('error', 'Não autorizado: Token inválido.');
+            }
+          });
+
+
     // Ouvinte para novas mensagens
     socket.on('chat message', async (data) => {
-        
-        socket.username = data.username;
-        
-        
+               
         try {
             let messageData = {
-                username: data.username,
+                username: data.username, // Usa o nome de usuário associado ao socket
                 timestamp: new Date(),
             };
+
     
             if (data.text) {
                 messageData.text = data.text; // Mensagem de texto
@@ -179,35 +308,35 @@ io.on('connection', async (socket) => {
     });
     
 
-    socket.on('set username', async (username) => {
-        socket.username = username; // Armazena o nome de usuário na sessão do socket
-        const joinMessage = new Message({
-            username: 'System',
-            text: `${username} has entered the chat`,
-            type: 'info'
-        });
+    // socket.on('set username', async (username) => {
+    //     socket.username = username; // Armazena o nome de usuário na sessão do socket
+    //     const joinMessage = new Message({
+    //         username: 'System',
+    //         text: `${username} has entered the chat`,
+    //         type: 'info'
+    //     });
 
         
 
-        await joinMessage.save();
-        io.emit('chat message', joinMessage);
+    //     await joinMessage.save();
+    //     io.emit('chat message', joinMessage);
 
-        // console.log(joinMessage);
-    });
+    //     // console.log(joinMessage);
+    // });
 
 
-    socket.on('logout', async (username) => {
-        socket.username = username;
-        //socket.isLogoutIntentional = true; // Define a flag para logout intencional
+    // socket.on('logout', async (username) => {
+    //     socket.username = username;
+    //     //socket.isLogoutIntentional = true; // Define a flag para logout intencional
 
-        const leftMessage = new Message({
-            username: 'System',
-            text: `${username} has left the chat`,
-            type: 'info'
-        });
-        await leftMessage.save();
-        io.emit('chat message', leftMessage);
-    });
+    //     const leftMessage = new Message({
+    //         username: 'System',
+    //         text: `${username} has left the chat`,
+    //         type: 'info'
+    //     });
+    //     await leftMessage.save();
+    //     io.emit('chat message', leftMessage);
+    // });
 
 
         // Ouvinte para mensagens privadas
@@ -231,21 +360,6 @@ io.on('connection', async (socket) => {
             }
         });
 
-     // Middleware para verificar o token do socket
-    socket.use(([event, data], next) => {
-        if (event === 'private message') {
-            try {
-                const token = data.token;
-                const decoded = jwt.verify(token, process.env.JWT_SECRET);
-                socket.userID = decoded.userID;   
-                next();
-            } catch (error) {
-                next(new Error('Não autorizado: Token inválido.'));
-            }
-        } else {
-            next();
-        }      
-    });   
 
     
 

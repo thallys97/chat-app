@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
@@ -8,15 +9,68 @@
 </head>
 <body>
     <div id="register-container">
+        <h2>Registrar</h2>
         <form id="register-form">
-            <input type="text" id="register-username" placeholder="Nome de usuário" required />
-            <input type="password" id="register-password" placeholder="Senha" required />
+            <input type="text" id="register-username" placeholder="Nome de usuário" required>
+            <input type="password" id="register-password" placeholder="Senha" required>
+            <input type="password" id="confirm-password" placeholder="Confirme a senha" required>
             <button type="submit">Registrar</button>
         </form>
-        <button onclick="window.location='index.html';">Voltar</button>
+        <a class="button" onclick="window.location='index.html';">Voltar</a>
     </div>
 
     <!-- Scripts -->
-    <script type="module" src="script.js"></script>
+    <!-- <script type="module" src="script.js"></script> -->
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        document.getElementById('register-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+        
+            const username = document.getElementById('register-username').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            // Verifica se as senhas são iguais
+            if (password !== confirmPassword) {
+                alert('As senhas não coincidem. Por favor, tente novamente.');
+                return;
+            }
+        
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password }),
+                });
+            
+                if (response.ok) {
+                    const { token } = await response.json();
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('username', username); // Armazena o username no localStorage
+
+                    // Conecta-se ao socket
+                    const socket = io();
+
+                    // Aguarda a conexão ser estabelecida
+                    socket.on('connect', () => {
+                        // Autentica o usuário assim que a conexão WebSocket é estabelecida
+                        socket.emit('authenticate', { token: token });
+                    });
+
+                    // Redireciona para index.html após a autenticação bem-sucedida
+                    window.location.href = 'index.html';
+                } else {
+                    alert('Falha no registro. Tente novamente.');
+                }
+            } catch (error) {
+                console.error('Erro no registro:', error);
+                alert('Erro ao tentar registro.');
+            }    
+
+        });
+    </script>
 </body>
 </html>

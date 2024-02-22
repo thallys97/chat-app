@@ -5,29 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat App</title>
     <link rel="stylesheet" href="style.css">
+    
 </head>
 <body>
-    <div id="chat-container">
-        <div id="welcome-container">
-            <button id="login-btn" onclick="window.location='login.html';">Login</button>
-            <button id="register-btn" onclick="window.location='register.html';">Registrar</button>
+    
+        <div id="auth-container" style="display: none;">            
+                <a class="button" id="login-btn" onclick="location.href='login.html'">Login</a>
+                <a class="button" id="register-btn" onclick="location.href='register.html'">Registrar</a>            
         </div>
-        <input type="text" id="username" placeholder="Digite seu nome de usuário" autofocus />
-        <button id="set-username-btn">Entrar</button> <!-- Botão para definir o nome de usuário -->
-        <button id="logout-btn" style="display:none;">Sair</button> <!-- Botão para sair -->
-        <div id="messages"></div>
-        <form id="message-form">
-            <input type="text" id="message-input" placeholder="Digite uma mensagem" />
-            <div>
-                <input type="file" id="file-input" accept="image/*, video/*" /> <!-- Input para arquivos -->
-                <small id="file-size-info">Tamanho máximo: 20 MB</small>
-            </div>
-            <button type="submit">Enviar</button>
-        </form>
-        <button id="emoji-button">😊</button>
-    </div>
+        <div id="chat-container">
+            <!-- <input type="text" id="username" placeholder="Digite seu nome de usuário" autofocus /> -->
+            <!-- <button id="set-username-btn">Entrar</button> Botão para definir o nome de usuário -->
+            <!--  <button id="logout-btn" style="display:none;">Sair</button>  --> <!-- Botão para sair -->
+            <button class="button" id="logout-btn">Sair</button>
+            <div id="messages"></div>
+            <form id="message-form">
+                <input type="text" id="message-input" placeholder="Digite uma mensagem" />
+                <div>
+                    <input type="file" id="file-input" accept="image/*, video/*" /> <!-- Input para arquivos -->
+                    <small id="file-size-info">Tamanho máximo: 20 MB</small>
+                </div>
+                <button class="button" type="submit">Enviar</button>
+            </form>
+            <button class="button" id="emoji-button">😊</button>
+        </div>    
+    
     <script src="/socket.io/socket.io.js"></script>
     <script type="module" src="script.js"></script>
+
 </body>
 </html>
 

@@ -11,6 +11,10 @@ body, html {
     padding: 20px;
 }
 
+#logout-btn {
+    display: none;
+}
+
 #messages {
     margin-bottom: 20px;
     height: 300px;
@@ -41,7 +45,7 @@ body, html {
 }
 
 
-button {
+.button {
     padding: 10px 15px;
     border: none;
     background-color: #007bff;
@@ -51,7 +55,7 @@ button {
     transition: background-color 0.3s; /* Transição suave para o hover */
 }
 
-button:hover {
+.button:hover {
     background-color: #0056b3;
 }
 
@@ -96,7 +100,7 @@ button:hover {
         flex-grow: 0;
     }
 
-    button {
+    .button {
         width: 100%;
     }
 

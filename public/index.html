@@ -9,10 +9,22 @@
 </head>
 <body>
     
-        <div id="auth-container" style="display: none;">            
-                <a class="button" id="login-btn" onclick="location.href='login.html'">Login</a>
-                <a class="button" id="register-btn" onclick="location.href='register.html'">Registrar</a>            
+    <div id="auth-container" style="display: none;">            
+        <a class="button" id="login-btn" onclick="location.href='login.html'">Login</a>
+        <a class="button" id="register-btn" onclick="location.href='register.html'">Registrar</a>            
+    </div>
+
+        <button id="toggle-sidebar" class="button">☰</button>
+        <div id="sidebar">
+             <!-- Botão para alternar a barra lateral -->
+            <div id="general-chat" class="sidebar-item">Chat Geral</div>
+            <div id="create-private-chat" class="sidebar-item">Criar Chat Privado</div>
+            <div id="private-chats-container">
+                <div class="sidebar-title">Chats Privados</div>
+                <!-- Lista de chats privados será inserida aqui -->
+            </div>
         </div>
+
         <div id="chat-container">
             <!-- <input type="text" id="username" placeholder="Digite seu nome de usuário" autofocus /> -->
             <!-- <button id="set-username-btn">Entrar</button> Botão para definir o nome de usuário -->
@@ -33,10 +45,12 @@
                 <button id="user-search-btn">Buscar</button>
                 <div id="search-results"></div>
             </div>            
-        </div>    
+        </div>
+        
     
     <script src="/socket.io/socket.io.js"></script>
     <script type="module" src="script.js"></script>
+    <script src="side-bar.js"></script>
     <script src="private-chat.js"></script>
 
 </body>

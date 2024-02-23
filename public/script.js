@@ -13,10 +13,14 @@ function checkAuth() {
     const messagesContainer = document.getElementById('messages');
     const emojiButton = document.querySelector('#emoji-button');
     const userSearch = document.getElementById('user-search-container');
+    const sidebarChat = document.getElementById('sidebar');
+    const sidebarChatBtn = document.getElementById('toggle-sidebar');
     
     if (token) {
         // Se o token existir, assumimos que o usuário está logado
         authContainer.style.display = 'none';
+        sidebarChatBtn.style.display = 'block';
+        sidebarChat.style.display = 'block';
         messageForm.style.display = 'flex';
         emojiButton.style.display = 'inline-block'; // ou 'block', dependendo do seu layout
         logoutBtn.style.display = 'block';
@@ -27,6 +31,8 @@ function checkAuth() {
     } else {
         // Se não houver token, o usuário não está logado
         logoutBtn.style.display = 'none';
+        sidebarChatBtn.style.display = 'none';
+        sidebarChat.style.display = 'none';
         authContainer.style.display = 'block';
         messageForm.style.display = 'none';
         emojiButton.style.display = 'none';
@@ -108,7 +114,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-
     }
 
     const loginBtn = document.getElementById('login-btn');
@@ -170,8 +175,6 @@ document.addEventListener('DOMContentLoaded', function() {
     //     emojiButton.style.display = 'none';
     //     logoutBtn.style.display = 'none';
     // }
-
-
 
 
 

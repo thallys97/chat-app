@@ -12,6 +12,7 @@ function checkAuth() {
     const messageInput = document.getElementById('message-input');
     const messagesContainer = document.getElementById('messages');
     const emojiButton = document.querySelector('#emoji-button');
+    const userSearch = document.getElementById('user-search-container');
     
     if (token) {
         // Se o token existir, assumimos que o usuário está logado
@@ -19,13 +20,17 @@ function checkAuth() {
         messageForm.style.display = 'flex';
         emojiButton.style.display = 'inline-block'; // ou 'block', dependendo do seu layout
         logoutBtn.style.display = 'block';
+        userSearch.style.display = 'block';
+
         messageInput.focus();
+
     } else {
         // Se não houver token, o usuário não está logado
         logoutBtn.style.display = 'none';
         authContainer.style.display = 'block';
         messageForm.style.display = 'none';
         emojiButton.style.display = 'none';
+        userSearch.style.display = 'none';
     }
 }
 
@@ -92,6 +97,18 @@ document.addEventListener('DOMContentLoaded', function() {
         // Atualiza a UI com o nome de usuário ou realiza outras ações necessárias
         console.log('Usuário autenticado:', data.username);
         });
+
+        const searchUserBtn = document.getElementById('user-search-btn');
+        const searchUserInput = document.getElementById('user-search-input');
+    
+        searchUserBtn.addEventListener('click', function() {
+            const searchTerm = searchUserInput.value.trim();
+            if (searchTerm) {
+                fetchUsers(searchTerm);
+            }
+        });
+
+
     }
 
     const loginBtn = document.getElementById('login-btn');

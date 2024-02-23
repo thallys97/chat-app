@@ -188,6 +188,36 @@ app.post('/upload', upload.single('file'), (req, res) => {
 app.use('/uploads', express.static('uploads'));
 
 
+app.get('/users', withAuth, async (req, res) => {
+    try {
+        // Encontre todos os usuários, exceto o próprio usuário que faz a solicitação
+        const users = await User.find({ _id: { $ne: req.userID }}).select('username');
+        res.json(users);
+    } catch (error) {
+        console.error('Erro ao buscar usuários:', error);
+        res.status(500).send('Erro interno do servidor.');
+    }
+});
+
+
+// Rota para buscar usuários
+app.post('/search-users', withAuth, async (req, res) => {
+    try {
+        const searchTerm = req.body.searchTerm;
+        if (typeof searchTerm !== 'string') {
+            throw new Error('searchTerm deve ser uma string');
+        }
+        const users = await User.find({
+            username: { $regex: new RegExp(searchTerm, 'i') }, // Use o construtor RegExp para garantir que seja uma expressão regular
+            _id: { $ne: req.userID }
+        }).select('username');
+        res.json(users);
+    } catch (error) {
+        console.error('Erro ao buscar usuários:', error);
+        res.status(500).send('Erro interno do servidor.');
+    }
+});
+
 
 io.on('connection', async (socket) => {
     // Enviar mensagens anteriores
@@ -338,25 +368,24 @@ io.on('connection', async (socket) => {
     //     io.emit('chat message', leftMessage);
     // });
 
+    socket.on('start private chat', ({ receiverID }) => {
+        // Código para iniciar um chat privado
+    });
+
 
         // Ouvinte para mensagens privadas
-        socket.on('private message', (data) => {
-            // 'data' deve incluir 'text' e 'receiverID'
-            const { receiverID, text } = data;
-            const newMessage = new Message({
-                senderID: socket.userID, // O ID do remetente agora é obtido pelo token
-                receiverID,
-                text,
-                type: 'private'
-            });
-            newMessage.save();
-            
-            // Envia a mensagem para o socket específico do receptor
-            const receiverSocket = io.sockets.connected[receiverID];
-            if (receiverSocket) {
-                receiverSocket.emit('private message', newMessage);
-            } else {
-                socket.emit('error', 'Usuário não encontrado.');
+        socket.on('private message', async ({ receiverID, text }) => {
+            try {
+                const newMessage = new Message({
+                    senderID: socket.userID,
+                    receiverID,
+                    text,
+                    type: 'private'
+                });
+                await newMessage.save();
+                socket.to(receiverID).emit('private message', newMessage);
+            } catch (error) {
+                console.error('Erro ao enviar mensagem privada:', error);
             }
         });
 

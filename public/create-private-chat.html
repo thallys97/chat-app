@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Chat Privado - Chat App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <button id="toggle-sidebar" class="button">☰</button>
+    <div id="sidebar">
+         <!-- Botão para alternar a barra lateral -->
+        <div id="general-chat" class="sidebar-item">Chat Geral</div>
+        <div id="create-private-chat" class="sidebar-item">Criar Chat Privado</div>
+        <div id="private-chats-container">
+            <div class="sidebar-title">Chats Privados</div>
+            <!-- Lista de chats privados será inserida aqui -->
+        </div>
+    </div>
+
+    <div id="create-private-chat-container">
+        <h1>Procure o usuário desejado e comece um chat privado</h1>
+        <input type="text" id="private-chat-user-search-input" placeholder="Digite o nome do usuário" />
+        <button id="private-chat-search-btn" class="button">Buscar</button>
+        <div id="search-results"></div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- <script type="module" src="script.js"></script> -->
+    <script src="side-bar.js"></script>
+    <script src="private-chat.js"></script>
+</body>
+</html>

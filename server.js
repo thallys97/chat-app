@@ -65,7 +65,8 @@ app.post('/register', async (req, res) => {
         await user.save();
 
         // Loga o usuário e retorna um token
-        const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+        // const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+        const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET);
         res.json({ token }); // Envia o token para o cliente
 
         // Emita uma mensagem de boas-vindas no chat
@@ -100,7 +101,8 @@ app.post('/login', async (req, res) => {
             return res.status(401).send('Credenciais inválidas.');
         }
 
-        const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+        // const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+        const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET);
         res.json({ token }); // Envie o token como JSON
 
         // Emita uma mensagem no chat indicando que o usuário entrou

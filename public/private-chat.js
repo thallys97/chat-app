@@ -76,3 +76,15 @@ function displaySearchResults(users) {
         // Iniciar chat privado
         socket.emit('start private chat', { receiverID });
     }
+
+
+    const token = localStorage.getItem('token');
+    if (token) {
+
+        document.getElementById('private-chat-search-btn').addEventListener('click', function() {
+            const searchTerm = document.getElementById('private-chat-user-search-input').value.trim();
+            if (searchTerm) {
+                fetchUsers(searchTerm);
+            }
+        });
+    };

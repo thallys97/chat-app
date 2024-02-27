@@ -12,31 +12,47 @@ function checkAuth() {
     const messageInput = document.getElementById('message-input');
     const messagesContainer = document.getElementById('messages');
     const emojiButton = document.querySelector('#emoji-button');
-    const userSearch = document.getElementById('user-search-container');
+    //const userSearch = document.getElementById('user-search-container');
     const sidebarChat = document.getElementById('sidebar');
     const sidebarChatBtn = document.getElementById('toggle-sidebar');
+    const chatContainer = document.getElementById('chat-container');
     
     if (token) {
         // Se o token existir, assumimos que o usuário está logado
-        authContainer.style.display = 'none';
+        if (authContainer) {
+            authContainer.style.display = 'none';
+        }   
         sidebarChatBtn.style.display = 'block';
         sidebarChat.style.display = 'block';
-        messageForm.style.display = 'flex';
-        emojiButton.style.display = 'inline-block'; // ou 'block', dependendo do seu layout
-        logoutBtn.style.display = 'block';
-        userSearch.style.display = 'block';
 
-        messageInput.focus();
+        if(chatContainer){
+            messageForm.style.display = 'flex';
+            emojiButton.style.display = 'inline-block'; // ou 'block', dependendo do seu layout
+            logoutBtn.style.display = 'block';
+
+            messageInput.focus();
+        }
+        
+        //userSearch.style.display = 'block';
+
+        
 
     } else {
         // Se não houver token, o usuário não está logado
-        logoutBtn.style.display = 'none';
+        if(chatContainer){
+
+            logoutBtn.style.display = 'none';
+            messageForm.style.display = 'none';
+            emojiButton.style.display = 'none';
+        }
+        
         sidebarChatBtn.style.display = 'none';
         sidebarChat.style.display = 'none';
-        authContainer.style.display = 'block';
-        messageForm.style.display = 'none';
-        emojiButton.style.display = 'none';
-        userSearch.style.display = 'none';
+        if (authContainer) {
+            authContainer.style.display = 'block';
+        }
+
+        //userSearch.style.display = 'none';
     }
 }
 
@@ -101,18 +117,18 @@ document.addEventListener('DOMContentLoaded', function() {
         
         socket.on('authenticated', (data) => {
         // Atualiza a UI com o nome de usuário ou realiza outras ações necessárias
-        console.log('Usuário autenticado:', data.username);
+        //console.log('Usuário autenticado:', data.username);
         });
 
-        const searchUserBtn = document.getElementById('user-search-btn');
-        const searchUserInput = document.getElementById('user-search-input');
+        // const searchUserBtn = document.getElementById('user-search-btn');
+        // const searchUserInput = document.getElementById('user-search-input');
     
-        searchUserBtn.addEventListener('click', function() {
-            const searchTerm = searchUserInput.value.trim();
-            if (searchTerm) {
-                fetchUsers(searchTerm);
-            }
-        });
+        // searchUserBtn.addEventListener('click', function() {
+        //     const searchTerm = searchUserInput.value.trim();
+        //     if (searchTerm) {
+        //         fetchUsers(searchTerm);
+        //     }
+        // });
 
     }
 

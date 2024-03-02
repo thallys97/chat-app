@@ -81,6 +81,8 @@ async function logout() {
             // Remove o token e o username do armazenamento local
             localStorage.removeItem('token');
             localStorage.removeItem('username');
+            // localStorage.removeItem('userID');
+            // localStorage.removeItem('activeChat');
 
             // Desconecta o socket ao fazer logout
             socket.disconnect();
@@ -295,7 +297,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Função para exibir mensagens
     function displayMessage(data) {  
 
-        //console.log(data);
+        if(data.roomID){
+
+            return;
+
+        }
 
         const messageElement = document.createElement('div');
     

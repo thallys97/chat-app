@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Room</title>
+    <link rel="stylesheet" href="create-room.css">
+    
+</head>
+<body>
+
+
+    <h1>Criar Sala de Chat</h1>
+    <form id="create-room-form">
+        <input type="text" id="room-name" placeholder="Nome da Sala" required>
+        <input type="text" id="user-search-input" placeholder="Buscar usuários" />
+        <button type="button" class="clear-results">Limpar resultados</button>
+        <div id="user-search-results"></div>
+        <div id="selected-users-container">
+            <h2>Usuários na Sala:</h2>
+            <div id="selected-users-list"></div>
+        </div>
+        <button type="submit">Criar Sala</button>
+    </form>
+    <script src="create-room.js"></script>
+
+
+</body>
+</html>

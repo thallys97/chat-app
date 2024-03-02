@@ -1,0 +1,16 @@
+/* create-room.css */
+.user-search-result {
+    padding: 5px;
+    margin: 5px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.user-search-result.selected {
+    background-color: #c8e6c9; /* cor de fundo para itens selecionados */
+}
+
+
+/* .selected {
+    background-color: #c8e6c9; /* verde claro 
+} */

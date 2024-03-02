@@ -9,7 +9,10 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const Room = require('./roomModel');
+
 const { Console } = require('console');
+
 
 require('dotenv').config();
 
@@ -67,7 +70,7 @@ app.post('/register', async (req, res) => {
         // Loga o usuário e retorna um token
         // const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
         const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET);
-        res.json({ token }); // Envia o token para o cliente
+        res.json({ token, userID: user._id }); // Envia o token para o cliente
 
         // Emita uma mensagem de boas-vindas no chat
         const joinMessage = new Message({
@@ -103,7 +106,7 @@ app.post('/login', async (req, res) => {
 
         // const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
         const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET);
-        res.json({ token }); // Envie o token como JSON
+        res.json({ token, userID: user._id }); // Envie o token como JSON
 
         // Emita uma mensagem no chat indicando que o usuário entrou
         const joinMessage = new Message({
@@ -150,6 +153,33 @@ app.post('/logout', withAuth, async (req, res) => {
     }
 });
 
+
+
+app.post('/create-room', withAuth, async (req, res) => {
+    try {
+        const { name, participantIds } = req.body;
+        // Verificar se todos os participantIds são válidos e únicos
+        const uniqueParticipantIds = [...new Set(participantIds)];
+        const participants = await User.find({ _id: { $in: uniqueParticipantIds } });
+
+        // Verificar se todos os usuários existem
+        if (participants.length !== uniqueParticipantIds.length) {
+            return res.status(400).send('Alguns usuários não foram encontrados.');
+        }
+
+        const newRoom = new Room({
+            name,
+            createdBy: req.userID,
+            participants: [req.userID, ...participants.map(u => u._id)]
+        });
+
+        const savedRoom = await newRoom.save();
+        res.status(201).json(savedRoom);
+    } catch (error) {
+        console.error('Erro ao criar sala:', error);
+        res.status(500).send('Erro interno do servidor.');
+    }
+});
 
 
 
@@ -206,19 +236,32 @@ app.get('/users', withAuth, async (req, res) => {
 app.post('/search-users', withAuth, async (req, res) => {
     try {
         const searchTerm = req.body.searchTerm;
-        if (typeof searchTerm !== 'string') {
-            throw new Error('searchTerm deve ser uma string');
+        if (typeof searchTerm !== 'string' || searchTerm.trim() === '') {
+            return res.status(400).send('Termo de pesquisa deve ser uma string não vazia.');
         }
+        
+        const regex = new RegExp(searchTerm.trim(), 'i');
         const users = await User.find({
-            username: { $regex: new RegExp(searchTerm, 'i') }, // Use o construtor RegExp para garantir que seja uma expressão regular
+            username: regex,
             _id: { $ne: req.userID }
-        }).select('username');
+        }, 'username _id'); // Somente retorna o username e o _id
+
         res.json(users);
     } catch (error) {
         console.error('Erro ao buscar usuários:', error);
         res.status(500).send('Erro interno do servidor.');
     }
 });
+
+// Rota para buscar o histórico de mensagens de uma sala
+app.get('/rooms/:roomID/messages', withAuth, async (req, res) => {
+    try {
+      const messages = await Message.find({ roomID: req.params.roomID }).sort({ timestamp: 1 });
+      res.json(messages);
+    } catch (error) {
+      res.status(500).send('Erro ao buscar mensagens.');
+    }
+  });
 
 
 io.on('connection', async (socket) => {
@@ -340,78 +383,33 @@ io.on('connection', async (socket) => {
     });
     
 
-    // socket.on('set username', async (username) => {
-    //     socket.username = username; // Armazena o nome de usuário na sessão do socket
-    //     const joinMessage = new Message({
-    //         username: 'System',
-    //         text: `${username} has entered the chat`,
-    //         type: 'info'
-    //     });
+    //SESSÃO DO CHAT PRIVADO
 
-        
-
-    //     await joinMessage.save();
-    //     io.emit('chat message', joinMessage);
-
-    //     // console.log(joinMessage);
-    // });
-
-
-    // socket.on('logout', async (username) => {
-    //     socket.username = username;
-    //     //socket.isLogoutIntentional = true; // Define a flag para logout intencional
-
-    //     const leftMessage = new Message({
-    //         username: 'System',
-    //         text: `${username} has left the chat`,
-    //         type: 'info'
-    //     });
-    //     await leftMessage.save();
-    //     io.emit('chat message', leftMessage);
-    // });
-
-    socket.on('start private chat', ({ receiverID }) => {
-        // Código para iniciar um chat privado
-    });
-
-
-        // Ouvinte para mensagens privadas
-        socket.on('private message', async ({ receiverID, text }) => {
-            try {
-                const newMessage = new Message({
-                    senderID: socket.userID,
-                    receiverID,
-                    text,
-                    type: 'private'
-                });
-                await newMessage.save();
-                socket.to(receiverID).emit('private message', newMessage);
-            } catch (error) {
-                console.error('Erro ao enviar mensagem privada:', error);
-            }
+    socket.on('joinRoom', ({ roomID, userID }) => {
+        socket.join(roomID);
+        // Enviar histórico de mensagens para o usuário
+        Message.find({ roomID: roomID })
+          .sort({ timestamp: 1 })
+          .then(messages => {
+            socket.emit('history', messages);
+          });
+      });
+    
+      socket.on('message', ({ roomID, message }) => {
+        // Adicione o roomID à mensagem antes de salvar
+        const newMessage = new Message({ ...message, roomID });
+        newMessage.save().then(savedMessage => {
+          // Emita a mensagem apenas para a sala específica
+          io.to(roomID).emit('message', savedMessage);
         });
-
-
+      });
+    
+      socket.on('leaveRoom', ({ roomID }) => {
+        socket.leave(roomID);
+      });
     
 
-    // socket.on('disconnect', async () => {
-    //     if (socket.isLogoutIntentional) {
-    //         // Se a desconexão foi intencional, não faz nada, pois a mensagem de saída já foi emitida
-    //         socket.isLogoutIntentional = false; // Reseta a flag
-    //     } else {
-    //         // Trata desconexões que não são causadas por logout intencional
-    //         if (socket.username) {
-    //             const leftMessage = new Message({
-    //                 username: 'System',
-    //                 message: `${socket.username} has left the chat unexpectedly`,
-    //                 type: 'info'
-    //             });
-    //             await leftMessage.save();
-    //             io.emit('chat message', leftMessage);
-    //         }
-    //     }
-    // });
-    
+
 
 });
 

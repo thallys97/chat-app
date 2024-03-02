@@ -39,9 +39,10 @@
                 });
 
                 if (response.ok) {
-                    const { token } = await response.json();
+                    const { token, userID } = await response.json();
                     localStorage.setItem('token', token);
                     localStorage.setItem('username', username); // Armazena o username no localStorage
+                    localStorage.setItem('userID', userID); // Armazena o userID no localStorage
 
                     // Conecta-se ao socket
                     const socket = io();

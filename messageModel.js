@@ -10,6 +10,7 @@ const messageSchema = new mongoose.Schema({
     timestamp: { type: Date, default: Date.now },
     senderID: String, // ID do usuário que envia a mensagem
     receiverID: String, // ID do usuário que recebe a mensagem (se for uma mensagem privada)
+    roomID: { type: mongoose.Schema.Types.ObjectId, ref: 'Room' }, // Referência à sala
 });
 
 

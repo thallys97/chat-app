@@ -264,6 +264,18 @@ app.get('/rooms/:roomID/messages', withAuth, async (req, res) => {
   });
 
 
+ // Adicionar esta rota no seu server.js
+app.get('/rooms/user/:userID', withAuth, async (req, res) => {
+    try {
+        const userID = req.params.userID;
+        const rooms = await Room.find({ participants: userID });
+        res.json(rooms);
+    } catch (error) {
+        res.status(500).send('Erro ao buscar salas.');
+    }
+});
+ 
+
 io.on('connection', async (socket) => {
     // Enviar mensagens anteriores
     try {

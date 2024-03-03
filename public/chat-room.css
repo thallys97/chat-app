@@ -2,3 +2,27 @@
 #chat-container {
     margin-left: 250px;
 }
+
+#messages {
+    list-style-type: none; /* Remove os bullet points */
+    padding: 0; /* Remove o padding padrão */
+}
+
+.message-content {
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.message-username {
+    font-weight: bold;
+}
+
+.message-timestamp {
+    color: #999;
+    font-size: 0.8em;
+    margin-top: 5px;
+}

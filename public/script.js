@@ -81,7 +81,7 @@ async function logout() {
             // Remove o token e o username do armazenamento local
             localStorage.removeItem('token');
             localStorage.removeItem('username');
-            // localStorage.removeItem('userID');
+            localStorage.removeItem('userID');
             // localStorage.removeItem('activeChat');
 
             // Desconecta o socket ao fazer logout

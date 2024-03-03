@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat App</title>
+    <link rel="stylesheet" href="base.css">
     <link rel="stylesheet" href="style.css">
     
 </head>
@@ -14,7 +15,10 @@
         <a class="button" id="register-btn" onclick="location.href='register.html'">Registrar</a>            
     </div>
 
-        <button id="toggle-sidebar" class="button">☰</button>
+        <div id="buttons-menu">
+            <button id="toggle-sidebar" class="button">☰</button>
+            <button class="button" id="logout-btn">Sair</button>
+        </div> 
         <div id="sidebar">
              <!-- Botão para alternar a barra lateral -->
             <div id="general-chat" class="sidebar-item"><a href="/index.html">Chat geral</a></div>
@@ -29,7 +33,7 @@
             <!-- <input type="text" id="username" placeholder="Digite seu nome de usuário" autofocus /> -->
             <!-- <button id="set-username-btn">Entrar</button> Botão para definir o nome de usuário -->
             <!--  <button id="logout-btn" style="display:none;">Sair</button>  --> <!-- Botão para sair -->
-            <button class="button" id="logout-btn">Sair</button>
+            <!-- <button class="button" id="logout-btn">Sair</button> -->
             <div id="messages"></div>
             <form id="message-form">
                 <input type="text" id="message-input" placeholder="Digite uma mensagem" />

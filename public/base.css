@@ -2,5 +2,9 @@
 #buttons-menu {
 
     display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    gap: 10px;
 
 }

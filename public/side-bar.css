@@ -2,7 +2,7 @@
 #sidebar {
     position: fixed;
     left: 0;
-    top: 50px;
+    top: 60px;
     width: 250px; /* Largura da barra lateral */
     height: 100%;
     background-color: #f4f4f4;

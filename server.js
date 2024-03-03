@@ -170,7 +170,8 @@ app.post('/create-room', withAuth, async (req, res) => {
         const newRoom = new Room({
             name,
             createdBy: req.userID,
-            participants: [req.userID, ...participants.map(u => u._id)]
+            participants: [...participants.map(u => u._id)]
+            //participants: [req.userID, ...participants.map(u => u._id)]
         });
 
         const savedRoom = await newRoom.save();

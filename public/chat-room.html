@@ -2,12 +2,16 @@
 <html lang="pt-br">
 <head>
   <!-- ... -->
+  <link rel="stylesheet" href="base.css">
   <link rel="stylesheet" href="chat-room.css">
   <link rel="stylesheet" href="side-bar.css">
 </head>
 <body>
 
-  <button id="toggle-sidebar" class="button">☰</button>
+    <div id="buttons-menu">
+      <button id="toggle-sidebar" class="button">☰</button>
+      <button class="button" id="logout-btn">Sair</button>
+    </div> 
     <div id="sidebar">
          <!-- Botão para alternar a barra lateral -->
         <div id="general-chat" class="sidebar-item"><a href="/index.html">Chat geral</a></div>
@@ -27,5 +31,6 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="chat-room.js"></script>
   <script src="side-bar.js"></script>
+  <script src="logout.js"></script>
 </body>
 </html>

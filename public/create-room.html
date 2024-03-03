@@ -5,24 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Room</title>
     <link rel="stylesheet" href="create-room.css">
+    <link rel="stylesheet" href="side-bar.css">
     
 </head>
 <body>
 
-
-    <h1>Criar Sala de Chat</h1>
-    <form id="create-room-form">
-        <input type="text" id="room-name" placeholder="Nome da Sala" required>
-        <input type="text" id="user-search-input" placeholder="Buscar usuários" />
-        <button type="button" class="clear-results">Limpar resultados</button>
-        <div id="user-search-results"></div>
-        <div id="selected-users-container">
-            <h2>Usuários na Sala:</h2>
-            <div id="selected-users-list"></div>
+    <button id="toggle-sidebar" class="button">☰</button>
+    <div id="sidebar">
+         <!-- Botão para alternar a barra lateral -->
+        <div id="general-chat" class="sidebar-item"><a href="/index.html">Chat geral</a></div>
+        <div id="create-private-chat" class="sidebar-item"><a href="/create-room.html">Criar Chat Privado</a></div>
+        <div id="private-chats-container">
+            <div class="sidebar-title">Chats Privados</div>
+            <!-- Lista de chats privados será inserida aqui -->
         </div>
-        <button type="submit">Criar Sala</button>
-    </form>
+    </div>
+
+    <div id="create-room-container">
+        <h1>Criar Sala de Chat</h1>
+        <form id="create-room-form">
+            <input type="text" id="room-name" placeholder="Nome da Sala" required>
+            <input type="text" id="user-search-input" placeholder="Buscar usuários" />
+            <button type="button" class="clear-results">Limpar resultados</button>
+            <div id="user-search-results"></div>
+            <div id="selected-users-container">
+                <h2>Usuários na Sala:</h2>
+                <div id="selected-users-list"></div>
+            </div>
+            <button type="submit">Criar Sala</button>
+        </form>
+    </div>
     <script src="create-room.js"></script>
+    <script src="side-bar.js"></script>
 
 
 </body>

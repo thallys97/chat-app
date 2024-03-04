@@ -6,6 +6,7 @@ const messageSchema = new mongoose.Schema({
     image: String, // URL da imagem
     video: String, // URL do vídeo
     link: String, // URL do link
+    gif: String, // URL do GIF
     type: { type: String, default: 'regular' }, // Tipo de mensagem: 'regular', 'info', 'image', 'video', 'link'
     timestamp: { type: Date, default: Date.now },
     senderID: String, // ID do usuário que envia a mensagem

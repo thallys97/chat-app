@@ -38,7 +38,7 @@ function createRoomElement(room) {
     roomLink.textContent = room.name;
   
     const collapseButton = document.createElement('button');
-    collapseButton.textContent = '▼';
+    collapseButton.textContent = '►';
     collapseButton.className = 'collapse-button';
     collapseButton.onclick = () => toggleParticipants(room._id, collapseButton);
   
@@ -67,11 +67,11 @@ async function toggleParticipants(roomId, button) {
         participantsList.appendChild(participantItem);
       });
       participantsList.style.display = 'block';
-      button.textContent = '▲';
+      button.textContent = '▼';
     } else {
       // Ocultar lista
       participantsList.style.display = 'none';
-      button.textContent = '▼';
+      button.textContent = '►';
     }
   }
 

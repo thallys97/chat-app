@@ -275,6 +275,21 @@ app.get('/rooms/user/:userID', withAuth, async (req, res) => {
         res.status(500).send('Erro ao buscar salas.');
     }
 });
+
+app.get('/search-gifs', async (req, res) => {
+    const query = req.query.q;
+    const apiKey = process.env.GIPHY_API_KEY;
+    const url = `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${encodeURIComponent(query)}`;
+  
+    try {
+      const giphyResponse = await fetch(url);
+      const giphyData = await giphyResponse.json();
+      res.json(giphyData.data); // Envie apenas os dados necessários para o cliente
+    } catch (error) {
+      console.error('Erro ao buscar GIFs:', error);
+      res.status(500).send('Erro ao buscar GIFs');
+    }
+  });
  
 
 io.on('connection', async (socket) => {
@@ -409,10 +424,22 @@ io.on('connection', async (socket) => {
       });
     
       socket.on('message', ({ roomID, message }) => {
-        // Adicione o roomID à mensagem antes de salvar
-        const newMessage = new Message({ ...message, roomID });
+        // Crie um novo objeto de mensagem com o tipo 'gif' se aplicável
+        const newMessageData = {
+          text: message.text,
+          username: message.username,
+          roomID: roomID,
+          timestamp: new Date(), // ou Date.now()
+          // Outros campos conforme necessário
+        };
+      
+        if (message.type === 'gif') {
+          newMessageData.gif = message.text; // A URL do GIF está em message.text
+          newMessageData.type = 'gif';
+        }
+      
+        const newMessage = new Message(newMessageData);
         newMessage.save().then(savedMessage => {
-          // Emita a mensagem apenas para a sala específica
           io.to(roomID).emit('message', savedMessage);
         });
       });

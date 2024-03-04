@@ -276,6 +276,38 @@ app.get('/rooms/user/:userID', withAuth, async (req, res) => {
     }
 });
 
+// Rota para buscar os participantes de uma sala específica
+app.get('/rooms/:roomId/participants', withAuth, async (req, res) => {
+    try {
+        // Obtenha o roomId dos parâmetros da rota
+        const roomId = req.params.roomId;
+
+        // Encontre a sala pelo ID
+        const room = await Room.findById(roomId).populate('participants', 'username');
+
+        if (!room) {
+            return res.status(404).send('Sala não encontrada.');
+        }
+
+        // Verifique se o usuário atual é um dos participantes da sala
+        if (!room.participants.some(participant => participant._id.toString() === req.userID)) {
+            return res.status(403).send('Acesso negado.');
+        }
+
+        // Mapeie os participantes para obter apenas as informações necessárias
+        const participants = room.participants.map(participant => ({
+            id: participant._id,
+            username: participant.username
+        }));
+
+        res.json(participants);
+    } catch (error) {
+        console.error('Erro ao buscar participantes:', error);
+        res.status(500).send('Erro interno do servidor.');
+    }
+});
+
+
 app.get('/search-gifs', async (req, res) => {
     const query = req.query.q;
     const apiKey = process.env.GIPHY_API_KEY;

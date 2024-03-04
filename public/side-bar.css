@@ -53,3 +53,39 @@
 .button:hover {
     background-color: #0056b3;
 }
+
+
+/* Estilo para o botão de colapsar/expandir */
+.collapse-toggle {
+  cursor: pointer;
+  padding-right: 5px;
+}
+
+/* Estilo para a lista de chats privados */
+#private-chats-container {
+  display: block; /* ou 'none' se você quiser que comece colapsada */
+}
+
+
+/* Estilos para a sala de chat privada */
+.private-chat-room {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Estilos para o botão de colapso */
+.collapse-button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 5px;
+  font-size: 1em;
+}
+
+/* Estilos para a lista de participantes */
+.participants-list {
+  list-style: none;
+  padding-left: 20px;
+  margin-top: 5px;
+}

@@ -47,6 +47,7 @@ function createRoomElement(room, currentUserID) {
 
         // Cria o botão de sair/apagar com base se o usuário é o criador ou não
         const actionButton = document.createElement('button');
+        actionButton.classList.add('leave-room-button');
         if (room.createdBy === currentUserID) {
             actionButton.textContent = 'Apagar sala';
             actionButton.onclick = () => deleteRoom(room._id);

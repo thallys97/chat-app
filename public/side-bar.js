@@ -1,5 +1,3 @@
-
-const socket = io();
   
 // side-bar.js
 const sidebar = document.getElementById('sidebar');
@@ -76,6 +74,7 @@ function leaveRoom(roomId) {
       if (response.ok) {
           // Remove a sala da barra lateral
           document.getElementById(`room-${roomId}`).remove();
+          window.location.href = 'index.html';
         } else {
           response.text().then(text => {
               console.error('Falha ao sair da sala:', text);
@@ -96,6 +95,7 @@ function deleteRoom(roomId) {
           if (response.ok) {
             // Remove a sala da barra lateral
             document.getElementById(`room-${roomId}`).remove();
+            window.location.href = 'index.html';
           } else {
             response.text().then(text => {
                 console.error('Falha ao apagar a sala:', text);
@@ -197,12 +197,12 @@ document.getElementById('toggle-private-chats').addEventListener('click', functi
     }
 });
 
-socket.on('user left', data => {
-  const leftUserId = data.userId;
-  document.querySelectorAll(`.participant-${leftUserId}`).forEach(el => el.remove());
-  });
+// socket.on('user left', data => {
+//   const leftUserId = data.userId;
+//   document.querySelectorAll(`.participant-${leftUserId}`).forEach(el => el.remove());
+//   });
   
-  socket.on('room deleted', data => {
-  const deletedRoomId = data.roomId;
-  document.querySelector(`.room-${deletedRoomId}`).remove();
-  });
+//   socket.on('room deleted', data => {
+//   const deletedRoomId = data.roomId;
+//   document.querySelector(`.room-${deletedRoomId}`).remove();
+//   });

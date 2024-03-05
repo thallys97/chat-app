@@ -323,8 +323,8 @@ app.post('/rooms/:roomId/leave', withAuth, async (req, res) => {
         room.participants.pull(req.userID);
         await room.save();
 
-        // Notifica os participantes restantes que o usuário saiu
-        io.to(roomId).emit('user left', { userId: req.userID });
+        // // Notifica os participantes restantes que o usuário saiu
+        // io.to(roomId).emit('user left', { userId: req.userID });
 
         res.send('Você saiu da sala com sucesso.');
     } catch (error) {
@@ -347,8 +347,8 @@ app.delete('/rooms/:roomId', withAuth, async (req, res) => {
         // Deleta a sala
         await Room.deleteOne({ _id: roomId });
 
-        // Notifica os participantes que a sala foi deletada
-        io.to(roomId).emit('room deleted', { roomId });
+        // // Notifica os participantes que a sala foi deletada
+        // io.to(roomId).emit('room deleted', { roomId });
 
         res.send('Sala apagada com sucesso.');
     } catch (error) {

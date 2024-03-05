@@ -374,6 +374,45 @@ app.get('/search-gifs', async (req, res) => {
   });
  
 
+
+//channels
+
+// Listar todos os canais
+app.get('/channels', withAuth, async (req, res) => {
+    const channels = await Channel.find({});
+    res.json(channels);
+});
+
+// Criar um novo canal
+app.post('/channels', withAuth, async (req, res) => {
+    const { name, topic } = req.body;
+    const newChannel = new Channel({
+        name,
+        topic,
+        participants: [req.userID] // Adiciona o criador como primeiro participante
+    });
+    try {
+        await newChannel.save();
+        res.status(201).json(newChannel);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
+app.get('/channels/:channelId/messages', withAuth, async (req, res) => {
+    try {
+        const channelId = req.params.channelId;
+        const channel = await Channel.findById(channelId).populate('messages');
+        if (!channel) {
+            return res.status(404).send('Canal não encontrado.');
+        }
+        res.json(channel.messages);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
+
 io.on('connection', async (socket) => {
     // Enviar mensagens anteriores
     try {
@@ -529,6 +568,28 @@ io.on('connection', async (socket) => {
       socket.on('leaveRoom', ({ roomID }) => {
         socket.leave(roomID);
       });
+
+
+
+    //SESSÃO DOS CANAIS
+
+    socket.on('joinChannel', ({ channelId }) => {
+        socket.join(channelId);
+    });
+    
+    socket.on('channelMessage', async ({ channelId, message }) => {
+        // Criar nova mensagem
+        const newMessage = new Message({
+            ...message,
+            channelID: channelId
+        });
+        await newMessage.save();
+    
+        // Associar mensagem ao canal
+        await Channel.findByIdAndUpdate(channelId, { $push: { messages: newMessage._id } });
+    
+        io.to(channelId).emit('message', message);
+    });
     
 
 

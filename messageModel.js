@@ -12,6 +12,7 @@ const messageSchema = new mongoose.Schema({
     senderID: String, // ID do usuário que envia a mensagem
     receiverID: String, // ID do usuário que recebe a mensagem (se for uma mensagem privada)
     roomID: { type: mongoose.Schema.Types.ObjectId, ref: 'Room' }, // Referência à sala
+    channelID: { type: mongoose.Schema.Types.ObjectId, ref: 'Channel' } // Associar mensagem a um canal
 });
 
 

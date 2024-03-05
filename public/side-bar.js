@@ -1,5 +1,5 @@
 
-
+const socket = io();
   
 // side-bar.js
 const sidebar = document.getElementById('sidebar');
@@ -28,10 +28,11 @@ toggleButton.addEventListener('click', function() {
 
 
 // Função para criar o botão de colapso, a lista de participantes e o link para cada sala
-function createRoomElement(room) {
+function createRoomElement(room, currentUserID) {
     // Criação do elemento da sala
     const roomElement = document.createElement('div');
     roomElement.className = 'sidebar-item';
+    roomElement.id = `room-${room._id}`;
   
     const roomLink = document.createElement('a');
     roomLink.href = `/chat-room.html?roomId=${room._id}`;
@@ -45,13 +46,64 @@ function createRoomElement(room) {
     const participantsList = document.createElement('ul');
     participantsList.className = 'participants-list';
     participantsList.style.display = 'none'; // Inicialmente oculto
+
+        // Cria o botão de sair/apagar com base se o usuário é o criador ou não
+        const actionButton = document.createElement('button');
+        if (room.createdBy === currentUserID) {
+            actionButton.textContent = 'Apagar sala';
+            actionButton.onclick = () => deleteRoom(room._id);
+        } else {
+            actionButton.textContent = 'Sair da sala';
+            actionButton.onclick = () => leaveRoom(room._id);
+        }
   
     roomElement.appendChild(roomLink);
     roomElement.appendChild(collapseButton);
     roomElement.appendChild(participantsList);
+    roomElement.appendChild(actionButton);
   
     return roomElement;
   }
+
+// Função para sair da sala
+function leaveRoom(roomId) {
+  fetch(`/rooms/${roomId}/leave`, {
+      method: 'POST',
+      headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+  }).then(response => {
+      if (response.ok) {
+          // Remove a sala da barra lateral
+          document.getElementById(`room-${roomId}`).remove();
+        } else {
+          response.text().then(text => {
+              console.error('Falha ao sair da sala:', text);
+          });
+      }
+  });
+}
+
+// Função para apagar sala
+function deleteRoom(roomId) {
+  if (confirm('Tem certeza que deseja apagar esta sala?')) {
+      fetch(`/rooms/${roomId}`, {
+          method: 'DELETE',
+          headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+      }).then(response => {
+          if (response.ok) {
+            // Remove a sala da barra lateral
+            document.getElementById(`room-${roomId}`).remove();
+          } else {
+            response.text().then(text => {
+                console.error('Falha ao apagar a sala:', text);
+            });
+        }
+      });
+  }
+}
 
   // Função para alternar a visualização dos participantes
 async function toggleParticipants(roomId, button) {
@@ -111,7 +163,7 @@ async function fetchAndDisplayUserRooms(userID) {
             const privateChatsContainer = document.getElementById('private-chats-container');
             privateChatsContainer.innerHTML = ''; // Limpe a lista existente antes de adicionar novas salas
             rooms.forEach(room => {
-              const roomElement = createRoomElement(room);
+              const roomElement = createRoomElement(room, userID);
               privateChatsContainer.appendChild(roomElement);
             });
           } else {
@@ -144,3 +196,13 @@ document.getElementById('toggle-private-chats').addEventListener('click', functi
         toggleIcon.textContent = '►'; // Atualiza o ícone para '►'
     }
 });
+
+socket.on('user left', data => {
+  const leftUserId = data.userId;
+  document.querySelectorAll(`.participant-${leftUserId}`).forEach(el => el.remove());
+  });
+  
+  socket.on('room deleted', data => {
+  const deletedRoomId = data.roomId;
+  document.querySelector(`.room-${deletedRoomId}`).remove();
+  });

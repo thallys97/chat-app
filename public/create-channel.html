@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Canal</title>
+    <link rel="stylesheet" href="base.css">
+    <link rel="stylesheet" href="create-channel.css">
+    <link rel="stylesheet" href="side-bar.css">
+</head>
+<body>
+
+
+    <div id="buttons-menu">
+        <button id="toggle-sidebar" class="button">☰</button>
+        <button class="button" id="logout-btn">Sair</button>
+    </div>     
+    <div id="sidebar">
+         <!-- Botão para alternar a barra lateral -->
+        <div id="general-chat" class="sidebar-item"><a href="/index.html">Chat geral</a></div>
+        <div id="create-private-chat" class="sidebar-item"><a href="/create-room.html">Criar Chat Privado</a></div>
+        <div id="create-channel" class="sidebar-item"><a href="/create-channel.html">Criar Canal</a></div>
+        <!-- Botão para colapsar/expandir os chats privados -->
+        <div class="sidebar-title">
+            Salas Privadas
+            <span id="toggle-private-chats" class="collapse-toggle">▼</span> 
+        </div>
+
+        <div id="private-chats-container">
+            <div class="private-chat-room">
+              <span class="room-name">Nome da Sala</span>
+              <button class="collapse-button">►</button>
+              <ul class="participants-list" style="display: none;">
+                <!-- Lista de participantes será inserida aqui -->
+              </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="create-channel-container">
+        <h2>Criar Canal</h2>
+        <form id="create-channel-form" action="/channels" method="POST">
+            <div class="form-group">
+                <label for="name">Nome do Canal:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="topic">Tópico do Canal:</label>
+                <select id="topic" name="topic" required>
+                    <option value="Amizade">Amizade</option>
+                    <option value="Animes">Animes</option>
+                    <option value="Esportes">Esportes</option>
+                    <option value="Filmes">Filmes</option>
+                    <option value="Games">Games</option>
+                    <option value="LGBTQ+">LGBTQ+</option>
+                    <option value="Músicas">Músicas</option>
+                    <option value="Namoro">Namoro</option>
+                    <option value="Séries">Séries</option>
+                </select>
+            </div>
+            <button type="submit">Criar Canal</button>
+        </form>
+    </div>
+
+    <script src="create-channel.js"></script> <!-- Ajuste o caminho conforme necessário -->
+    <script src="side-bar.js"></script>
+    <script src="logout.js"></script>
+</body>
+</html>

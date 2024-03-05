@@ -176,59 +176,6 @@ document.addEventListener('DOMContentLoaded', function() {
     emojiButton.addEventListener('click', () => picker.togglePicker(emojiButton));
 
 
-    //let username = localStorage.getItem('username') || '';
-
-
-    // if (username) {
-    //     // Se o nome de usuário estiver definido, mostra o form e o botão de emoji
-    //     messageForm.style.display = 'flex';
-    //     emojiButton.style.display = 'inline-block'; // ou 'block', dependendo do seu layout
-    //     usernameInput.style.display = 'none';
-    //     setUsernameBtn.style.display = 'none';
-    //     logoutBtn.style.display = 'block';
-    //     messageInput.focus();
-    // } else {
-    //     // Se o nome de usuário não estiver definido, esconde o form e o botão de emoji
-    //     messageForm.style.display = 'none';
-    //     emojiButton.style.display = 'none';
-    //     logoutBtn.style.display = 'none';
-    // }
-
-
-
-
-    // Função para definir o nome de usuário
-    // function setUsername() {
-    //     username = usernameInput.value.trim();
-    //     if (username) {
-    //         localStorage.setItem('username', username); // Armazena o nome de usuário no localStorage
-    //         socket.emit('set username', username); // Notify the server of the new username
-    //         usernameInput.style.display = 'none';
-    //         setUsernameBtn.style.display = 'none';
-    //         logoutBtn.style.display = 'block';
-    //         messageInput.focus();
-    //     } else {
-    //         alert('Por favor, insira um nome de usuário válido.');
-    //     }
-    // }
-
-    // // Adiciona um ouvinte de evento ao botão de definir nome de usuário
-    // setUsernameBtn.addEventListener('click', function () {
-    //     setUsername();
-    //     // socket.emit('set username', username);
-    //     window.location.reload();
-    // });
-
-
-    // // Adiciona um ouvinte de evento ao botão de sair
-    // logoutBtn.addEventListener('click', function() {
-    //     socket.emit('logout', username); // Optionally notify the server that the user is logging ou
-    //     localStorage.removeItem('username'); // Remove o nome de usuário do localStorage
-    //     window.location.reload(); // Recarrega a página para redefinir o estado
-    // });
-
-    
-
 
 
     // Função para fazer upload de arquivos
@@ -297,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Função para exibir mensagens
     function displayMessage(data) {  
 
-        if(data.roomID){
+        if(data.roomID || data.channelID){
 
             return;
 

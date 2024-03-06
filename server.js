@@ -10,6 +10,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const Room = require('./roomModel');
+const Channel = require('./channelModel');
 
 const { Console } = require('console');
 
@@ -412,6 +413,48 @@ app.get('/channels/:channelId/messages', withAuth, async (req, res) => {
     }
 });
 
+app.get('/channels/search', withAuth, async (req, res) => {
+    const { name, topic } = req.query;
+
+    let query = {};
+    if (name) query.name = new RegExp(name, 'i'); // Case-insensitive matching
+    if (topic) query.topic = topic;
+
+    try {
+        const channels = await Channel.find(query);
+        res.json(channels);
+    } catch (error) {
+        console.error('Erro ao buscar canais:', error);
+        res.status(500).send('Erro interno do servidor.');
+    }
+});
+
+app.post('/channels/:channelId/join', withAuth, async (req, res) => {
+    const channelId = req.params.channelId;
+    const userId = req.userID; // Supondo que withAuth middleware seta isso após verificação
+
+    try {
+        let channel = await Channel.findById(channelId);
+
+        if (!channel) {
+            return res.status(404).send('Canal não encontrado.');
+        }
+
+        // Verificar se o usuário já é um participante
+        if (channel.participants.includes(userId)) {
+            return res.status(400).send('Usuário já é um participante deste canal.');
+        }
+
+        channel.participants.push(userId);
+        await channel.save();
+
+        res.status(200).send('Usuário adicionado ao canal com sucesso.');
+    } catch (error) {
+        console.error('Erro ao adicionar usuário ao canal:', error);
+        res.status(500).send('Erro interno do servidor.');
+    }
+});
+
 
 io.on('connection', async (socket) => {
     // Enviar mensagens anteriores
@@ -575,20 +618,32 @@ io.on('connection', async (socket) => {
 
     socket.on('joinChannel', ({ channelId }) => {
         socket.join(channelId);
+
+         // Enviar histórico de mensagens para o usuário
+         Message.find({ channelID: channelId })
+         .sort({ timestamp: 1 })
+         .then(messages => {
+           socket.emit('history-channel', messages);
+         });
     });
     
-    socket.on('channelMessage', async ({ channelId, message }) => {
+    socket.on('channel-message', ({ channelId, message }) => {
         // Criar nova mensagem
-        const newMessage = new Message({
-            ...message,
-            channelID: channelId
-        });
-        await newMessage.save();
-    
-        // Associar mensagem ao canal
-        await Channel.findByIdAndUpdate(channelId, { $push: { messages: newMessage._id } });
-    
-        io.to(channelId).emit('message', message);
+
+        const newMessageChannel = {
+            text: message.text,
+            username: message.username,
+            channelID: channelId,
+            timestamp: new Date(),
+        };
+
+        
+        
+        const newMessage = new Message(newMessageChannel);
+        
+        newMessage.save().then(savedMessage => {
+            io.to(channelId).emit('channel-message', savedMessage);
+          });
     });
     
 

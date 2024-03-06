@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canal</title>
+    <link rel="stylesheet" href="base.css">
+    <link rel="stylesheet" href="channel.css"> <!-- Ajuste conforme necessário -->
+    <link rel="stylesheet" href="side-bar.css">
+</head>
+<body>
+
+<div id="buttons-menu">
+    <button id="toggle-sidebar" class="button">☰</button>
+    <button class="button" id="logout-btn">Sair</button>
+</div>
+<div id="sidebar">
+    <!-- Botão para alternar a barra lateral -->
+   <div id="general-chat" class="sidebar-item"><a href="/index.html">Chat geral</a></div>
+   <div id="create-private-chat" class="sidebar-item"><a href="/create-room.html">Criar Chat Privado</a></div>
+   <div id="create-channel" class="sidebar-item"><a href="/create-channel.html">Criar Canal</a></div>
+   <div id="search-channel" class="sidebar-item"><a href="/search-channel.html">Procurar Canal</a></div>
+
+   <!-- Botão para colapsar/expandir os chats privados -->
+     <div class="sidebar-title">
+       Salas Privadas
+       <span id="toggle-private-chats" class="collapse-toggle">▼</span> 
+   </div>
+
+   <div id="private-chats-container">
+     <div class="private-chat-room">
+       <span class="room-name">Nome da Sala</span>
+       <button class="collapse-button">►</button>
+       <ul class="participants-list" style="display: none;">
+         <!-- Lista de participantes será inserida aqui -->
+       </ul>
+     </div>
+   </div>
+</div>
+
+<div id="channel-container">
+  <ul id="messages-container">
+        <!-- As mensagens serão exibidas aqui -->
+  </ul>
+    <form id="message-form">
+        <input type="text" id="message-input" placeholder="Escreva sua mensagem aqui..." required>
+        <button type="submit">Enviar</button>
+    </form>
+</div>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="channel.js"></script> <!-- Ajuste o caminho conforme necessário -->
+<script src="side-bar.js"></script>
+<script src="logout.js"></script>
+</body>
+</html>

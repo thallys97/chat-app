@@ -10,14 +10,14 @@ document.getElementById('create-channel-form').addEventListener('submit', functi
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}` // Adicione o token aqui
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify(formData)
     })
     .then(response => response.json())
     .then(data => {
-        console.log('Canal criado com sucesso:', data);
-        // Redirecione o usuário ou atualize a interface aqui
+        // Redireciona para a página do canal com o ID do canal na URL
+        window.location.href = `/channel.html?channelId=${data._id}`;
     })
     .catch(error => {
         console.error('Erro ao criar o canal:', error);

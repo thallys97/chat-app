@@ -1,10 +1,12 @@
 /* Estilos para a barra lateral */
 #sidebar {
+    
     position: fixed;
     left: 0;
     top: 60px;
     width: 250px; /* Largura da barra lateral */
-    height: 100%;
+    height: calc(100% - 60px); /* Altura subtraindo a altura do menu superior */
+    overflow-y: auto; /* Adiciona rolagem vertical se o conteúdo for muito longo */
     background-color: #f4f4f4;
     border-right: 1px solid #ddd;
     box-shadow: 2px 0 5px rgba(0,0,0,0.1);

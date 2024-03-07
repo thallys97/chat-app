@@ -390,6 +390,7 @@ app.post('/channels', withAuth, async (req, res) => {
     const newChannel = new Channel({
         name,
         topic,
+        createdBy: req.userID,
         participants: [req.userID] // Adiciona o criador como primeiro participante
     });
     try {
@@ -454,6 +455,100 @@ app.post('/channels/:channelId/join', withAuth, async (req, res) => {
         res.status(500).send('Erro interno do servidor.');
     }
 });
+
+
+ // Adicionar esta rota no seu server.js
+ app.get('/channels/user/:userID', withAuth, async (req, res) => {
+    try {
+        const userID = req.params.userID;
+        const channels = await Channel.find({ participants: userID });
+        res.json(channels);
+    } catch (error) {
+        res.status(500).send('Erro ao buscar salas.');
+    }
+});
+
+// Rota para buscar os participantes de uma sala específica
+app.get('/channels/:channelId/participants', withAuth, async (req, res) => {
+    try {
+        // Obtenha o roomId dos parâmetros da rota
+        const channelId = req.params.channelId;
+
+        // Encontre a sala pelo ID
+        const channel = await Channel.findById(channelId).populate('participants', 'username');
+
+        if (!channel) {
+            return res.status(404).send('Canal não encontrado.');
+        }
+
+        // Verifique se o usuário atual é um dos participantes da sala
+        if (!channel.participants.some(participant => participant._id.toString() === req.userID)) {
+            return res.status(403).send('Acesso negado.');
+        }
+
+        // Mapeie os participantes para obter apenas as informações necessárias
+        const participants = channel.participants.map(participant => ({
+            id: participant._id,
+            username: participant.username
+        }));
+
+        res.json(participants);
+    } catch (error) {
+        console.error('Erro ao buscar participantes:', error);
+        res.status(500).send('Erro interno do servidor.');
+    }
+});
+
+
+// Rota para remover um participante do canal (sair do canal)
+app.post('/channels/:channelId/leave', withAuth, async (req, res) => {
+    try {
+        const channelId = req.params.channelId;
+        const channel = await Channel.findById(channelId);
+
+        // Verifica se o usuário é um participante
+        if (!channel.participants.includes(req.userID)) {
+            return res.status(403).send('Você não é um participante deste canal.');
+        }
+
+        // Remove o usuário da lista de participantes
+        channel.participants.pull(req.userID);
+        await channel.save();
+
+        // // Notifica os participantes restantes que o usuário saiu
+        // io.to(channelId).emit('user left', { userId: req.userID });
+
+        res.send('Você saiu do canal com sucesso.');
+    } catch (error) {
+        console.error('Erro ao sair do canal:', error);
+        res.status(500).send('Erro interno do servidor.');
+    }
+});
+
+// Rota para deletar uma sala (apagar sala)
+app.delete('/channels/:channelId', withAuth, async (req, res) => {
+    try {
+        const channelId = req.params.channelId;
+        const channel = await Channel.findById(channelId);
+
+        // Verifica se o usuário é o criador da sala
+        if (channel.createdBy.toString() !== req.userID) {
+            return res.status(403).send('Você não tem permissão para apagar este canal.');
+        }
+
+        // Deleta a sala
+        await Channel.deleteOne({ _id: channelId });
+
+        // // Notifica os participantes que a sala foi deletada
+        // io.to(roomId).emit('room deleted', { roomId });
+
+        res.send('Canal apagado com sucesso.');
+    } catch (error) {
+        console.error('Erro ao apagar sala:', error);
+        res.status(500).send('Erro interno do servidor.');
+    }
+});
+
 
 
 io.on('connection', async (socket) => {

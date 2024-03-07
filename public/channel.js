@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
           messageContent.appendChild(usernameSpan);
           messageContent.appendChild(timestampSpan);
       
-    
+          console.log(message.text);
           if (message.type === 'gif') {
             const gifImage = document.createElement('img');
             gifImage.src = message.text; // A URL do GIF está em message.text
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
             messageContent.appendChild(gifImage);
           } else {
             const textDiv = document.createElement('div');
-            textDiv.innerText = message.text;
+            textDiv.innerHTML = createLinkElement(message.text);
             messageContent.appendChild(textDiv);
           }
           
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
           messageContent.appendChild(gifImage);
         } else {
           const textDiv = document.createElement('div');
-          textDiv.innerText = message.text;
+          textDiv.innerHTML = createLinkElement(message.text);
           messageContent.appendChild(textDiv);
         }
 
@@ -127,7 +127,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const messageText = messageInput.value.trim();
 
             if (messageText) {
-                console.log(messageText);
 
                 socket.emit('channel-message', {
                     channelId,
@@ -139,6 +138,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 messageInput.value = ''; // Limpa o campo de input após enviar
             }
         });
+
+
+
+        // Função para verificar se a mensagem contém um link e transformá-lo em um elemento clicável
+    function createLinkElement(text) {
+      // Regex para identificar URLs na mensagem
+      const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+      // Substitui todas as ocorrências de URLs por um elemento âncora
+      return text.replace(urlRegex, function(url) {
+          return `<a href="${url}" target="_blank">${url}</a>`;
+      });
+  }
 
 
         //////////////////////////// Channel GIF ////////////////////////////

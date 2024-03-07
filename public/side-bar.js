@@ -176,12 +176,61 @@ async function fetchAndDisplayUserRooms(userID) {
     }
 }
 
+
+function highlightCurrentLocation() {
+  const currentPage = window.location.pathname.split("/").pop(); // Isso pegará o nome da página atual como 'index.html'
+  
+  // Remova a classe 'active' de todos os itens primeiro
+  const allSidebarLinks = document.querySelectorAll('#sidebar .sidebar-item');
+  allSidebarLinks.forEach(link => {
+    link.classList.remove('active');
+  });
+
+  // Destacar o item da barra lateral com base na página atual
+  switch (currentPage) {
+    case 'index.html':
+      document.querySelector('#general-chat').classList.add('active');
+      break;
+    case 'create-room.html':
+      document.querySelector('#create-private-chat').classList.add('active');
+      break;
+    case 'create-channel.html':
+      document.querySelector('#create-channel').classList.add('active');
+      break;
+    case 'search-channel.html':
+      document.querySelector('#search-channel').classList.add('active');
+      break;
+    // Se não for nenhuma das páginas estáticas, verifica se estamos numa sala ou canal
+    default:
+      const urlParams = new URLSearchParams(window.location.search);
+      const currentRoomId = urlParams.get('roomId');
+      const currentChannelId = urlParams.get('channelId');
+      
+      if (currentRoomId) {
+        const activeRoomElement = document.getElementById(`room-${currentRoomId}`);
+        if (activeRoomElement) {
+          activeRoomElement.classList.add('active');
+        }
+      }
+      
+      if (currentChannelId) {
+        const activeChannelElement = document.getElementById(`channel-${currentChannelId}`);
+        if (activeChannelElement) {
+          activeChannelElement.classList.add('active');
+        }
+      }
+      break;
+  }
+}
+
+
 // Chamar a função quando o DOM estiver pronto ou quando o usuário fizer login
 document.addEventListener('DOMContentLoaded', () => {
     const userID = localStorage.getItem('userID');
     if (userID) {
-        fetchAndDisplayUserRooms(userID);
-        fetchAndDisplayUserChannels(userID);
+      fetchAndDisplayUserRooms(userID).then(highlightCurrentLocation);
+      fetchAndDisplayUserChannels(userID).then(highlightCurrentLocation);
+      highlightCurrentLocation();
     }
 });
 

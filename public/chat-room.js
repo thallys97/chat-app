@@ -1,4 +1,4 @@
-// Adicione esta linha no topo do seu arquivo script.js
+// Adicione esta linha no topo do seu arquivo
 import { EmojiButton } from 'https://unpkg.com/@joeattardi/emoji-button@latest';
 
 const socket = io();

@@ -140,9 +140,10 @@ socket.on('history', (messages) => {
       gifImage.classList.add('gif-image');
       messageContent.appendChild(gifImage);
     } else {
-      const textDiv = document.createElement('div');
-      textDiv.innerHTML = createLinkElement(message.text);
-      messageContent.appendChild(textDiv);
+      const textParagraph = document.createElement('p');
+      textParagraph.classList.add('message-text');
+      textParagraph.innerHTML = createLinkElement(message.text);
+      messageContent.appendChild(textParagraph);
     }
 
     li.appendChild(messageContent);
@@ -179,9 +180,10 @@ socket.on('message', (message) => {
     gifImage.classList.add('gif-image');
     messageContent.appendChild(gifImage);
   } else {
-    const textDiv = document.createElement('div');
-    textDiv.innerHTML = createLinkElement(message.text);
-    messageContent.appendChild(textDiv);
+    const textParagraph = document.createElement('p');
+    textParagraph.classList.add('message-text');
+    textParagraph.innerHTML = createLinkElement(message.text);
+    messageContent.appendChild(textParagraph);
   }
 
   li.appendChild(messageContent);

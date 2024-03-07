@@ -36,6 +36,12 @@
   .sidebar-item:hover {
     background-color: #e9e9e9;
   }
+
+  .sidebar-item.active {
+    background-color: #3e3e3e; /* ou qualquer cor de destaque que você preferir */
+    color: white;
+}
+
   
   .sidebar-title {
     font-weight: bold;

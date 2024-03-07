@@ -78,9 +78,10 @@ document.addEventListener('DOMContentLoaded', function() {
             messageContent.appendChild(videoElement);
             
           } else {
-            const textDiv = document.createElement('div');
-            textDiv.innerHTML = createLinkElement(message.text);
-            messageContent.appendChild(textDiv);
+            const textParagraph = document.createElement('p');
+            textParagraph.classList.add('message-text');
+            textParagraph.innerHTML = createLinkElement(message.text);
+            messageContent.appendChild(textParagraph);
           }
           
       
@@ -138,9 +139,10 @@ document.addEventListener('DOMContentLoaded', function() {
           messageContent.appendChild(videoElement);
           
         } else {
-          const textDiv = document.createElement('div');
-          textDiv.innerHTML = createLinkElement(message.text);
-          messageContent.appendChild(textDiv);
+          const textParagraph = document.createElement('p');
+          textParagraph.classList.add('message-text');
+          textParagraph.innerHTML = createLinkElement(message.text);
+          messageContent.appendChild(textParagraph);
         }
 
         li.appendChild(messageContent);

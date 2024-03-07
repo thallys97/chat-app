@@ -732,7 +732,10 @@ io.on('connection', async (socket) => {
             timestamp: new Date(),
         };
 
-        
+        if (message.type === 'gif') {
+            newMessageChannel.gif = message.text; // A URL do GIF está em message.text
+            newMessageChannel.type = 'gif';
+          }
         
         const newMessage = new Message(newMessageChannel);
         
@@ -741,8 +744,6 @@ io.on('connection', async (socket) => {
           });
     });
     
-
-
 
 });
 

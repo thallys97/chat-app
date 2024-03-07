@@ -726,16 +726,29 @@ io.on('connection', async (socket) => {
         // Criar nova mensagem
 
         const newMessageChannel = {
-            text: message.text,
             username: message.username,
             channelID: channelId,
             timestamp: new Date(),
         };
 
+        if (message.text) {
+            newMessageChannel.text = message.text; // Mensagem de texto
+        }  
+
         if (message.type === 'gif') {
             newMessageChannel.gif = message.text; // A URL do GIF está em message.text
             newMessageChannel.type = 'gif';
-          }
+        }
+
+        if (message.file && message.type === 'image') {
+            newMessageChannel.image = message.file; // URL da imagem
+            newMessageChannel.type = 'image';
+        } 
+        
+        if (message.file && message.type === 'video') {
+            newMessageChannel.video = message.file; // URL do vídeo
+            newMessageChannel.type = 'video';
+        }  
         
         const newMessage = new Message(newMessageChannel);
         

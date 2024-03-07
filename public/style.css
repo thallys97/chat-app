@@ -106,6 +106,12 @@ body, html {
     background-color: #0056b3;
 }
 
+.button-index-send {
+
+    height: 2rem;
+
+}
+
 #username {
     margin-bottom: 20px;
     padding: 10px;
@@ -133,6 +139,11 @@ body, html {
     
 }
 
+.message-element {
+    white-space: normal;
+    overflow-wrap: break-word;
+    margin-top: 16px;
+}
 
 
 /* Estilização para dispositivos menores */

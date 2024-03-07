@@ -57,12 +57,26 @@ document.addEventListener('DOMContentLoaded', function() {
           messageContent.appendChild(usernameSpan);
           messageContent.appendChild(timestampSpan);
       
-          console.log(message.text);
           if (message.type === 'gif') {
             const gifImage = document.createElement('img');
             gifImage.src = message.text; // A URL do GIF está em message.text
             gifImage.classList.add('gif-image');
             messageContent.appendChild(gifImage);
+          } else if (message.type === 'image') {
+            const imageElement = document.createElement('img');
+            imageElement.classList.add('message-file');
+            imageElement.alt = 'Image';
+            imageElement.src = message.image;
+            messageContent.appendChild(imageElement);
+            
+          } else if (message.type === 'video') {
+            const videoElement = document.createElement('video');
+            videoElement.classList.add('message-file');
+            videoElement.alt = 'Video';
+            videoElement.src = message.video;
+            videoElement.controls = true;
+            messageContent.appendChild(videoElement);
+            
           } else {
             const textDiv = document.createElement('div');
             textDiv.innerHTML = createLinkElement(message.text);
@@ -107,6 +121,22 @@ document.addEventListener('DOMContentLoaded', function() {
           gifImage.src = message.text; // A URL do GIF está em message.text
           gifImage.classList.add('gif-image');
           messageContent.appendChild(gifImage);
+
+        } else if (message.type === 'image') {
+          const imageElement = document.createElement('img');
+          imageElement.classList.add('message-file');
+          imageElement.alt = 'Image';
+          imageElement.src = message.image;
+          messageContent.appendChild(imageElement);
+          
+        } else if (message.type === 'video') {
+          const videoElement = document.createElement('video');
+          videoElement.classList.add('message-file');
+          videoElement.src = message.video;
+          videoElement.alt = 'Video';
+          videoElement.controls = true;
+          messageContent.appendChild(videoElement);
+          
         } else {
           const textDiv = document.createElement('div');
           textDiv.innerHTML = createLinkElement(message.text);
@@ -125,6 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
       messageForm.addEventListener('submit', function(e) {
              e.preventDefault();
             const messageText = messageInput.value.trim();
+            const file = document.getElementById('file-input').files[0];
 
             if (messageText) {
 
@@ -136,6 +167,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 });
                 messageInput.value = ''; // Limpa o campo de input após enviar
+
+              } else if (file) {
+                // Se houver um arquivo, você precisa fazer upload para um servidor ou serviço de armazenamento de arquivos
+                // Depois de fazer upload do arquivo e obter a URL, você pode enviar essa URL como uma mensagem
+                uploadFile(file).then(response => {
+                    const url = response.url;
+                    socket.emit('channel-message', {
+                      channelId,
+                      message: {
+                          username: username, // Substitua por um método para obter o nome de usuário atual
+                          file: url,
+                          type: file.type.startsWith('image/') ? 'image' : 'video'
+                      }
+                    });
+                    messageInput.value = '';
+                    document.getElementById('file-input').value = ''; // Limpar o campo de arquivo
+                }).catch(error => {
+                    console.error('Falha ao enviar arquivo', error);
+                });
             }
         });
 
@@ -149,6 +199,34 @@ document.addEventListener('DOMContentLoaded', function() {
       return text.replace(urlRegex, function(url) {
           return `<a href="${url}" target="_blank">${url}</a>`;
       });
+  }
+  
+  
+        //////////////////////////// upload file ////////////////////////////
+        //////////////////////////// upload file ////////////////////////////
+        //////////////////////////// upload file ////////////////////////////
+
+      // Função para fazer upload de arquivos
+    async function uploadFile(file) {
+
+      if(file.size > 20 * 1024 * 1024) { // Se o arquivo for maior que 20 MB
+          alert('O arquivo é muito grande. O tamanho máximo permitido é de 20 MB.');
+          return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/upload', {
+          method: 'POST',
+          body: formData
+      });
+
+      if (!response.ok) {
+          throw new Error('Falha ao fazer upload do arquivo');
+      }
+
+      return response.json();
   }
 
 

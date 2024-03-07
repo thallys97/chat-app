@@ -101,6 +101,16 @@ gifSearchInput.addEventListener('input', () => {
   }
 
 
+  // Função para verificar se a mensagem contém um link e transformá-lo em um elemento clicável
+      function createLinkElement(text) {
+        // Regex para identificar URLs na mensagem
+        const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+          // Substitui todas as ocorrências de URLs por um elemento âncora
+        return text.replace(urlRegex, function(url) {
+            return `<a href="${url}" target="_blank">${url}</a>`;
+        });
+      }
+
 socket.emit('joinRoom', { roomID, userID });
 
 socket.on('history', (messages) => {
@@ -131,7 +141,7 @@ socket.on('history', (messages) => {
       messageContent.appendChild(gifImage);
     } else {
       const textDiv = document.createElement('div');
-      textDiv.innerText = message.text;
+      textDiv.innerHTML = createLinkElement(message.text);
       messageContent.appendChild(textDiv);
     }
 
@@ -170,7 +180,7 @@ socket.on('message', (message) => {
     messageContent.appendChild(gifImage);
   } else {
     const textDiv = document.createElement('div');
-    textDiv.innerText = message.text;
+    textDiv.innerHTML = createLinkElement(message.text);
     messageContent.appendChild(textDiv);
   }
 

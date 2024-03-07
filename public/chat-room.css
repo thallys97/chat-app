@@ -27,6 +27,11 @@
     margin-top: 5px;
 }
 
+.message-text {
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
 
 .modal {
     display: none;

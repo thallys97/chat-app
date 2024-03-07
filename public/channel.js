@@ -1,8 +1,21 @@
+import { EmojiButton } from 'https://unpkg.com/@joeattardi/emoji-button@latest';
+
 // Conectar ao WebSocket
 const socket = io();
 const urlParams = new URLSearchParams(window.location.search);
 const channelId = urlParams.get('channelId');
 
+
+const emojiButton = document.querySelector('#emoji-button');
+    const picker = new EmojiButton();
+
+    
+    picker.on('emoji', emojiObject => {
+        const emojiString = emojiObject.emoji; 
+        document.querySelector('#message-input').value += emojiString;
+    });
+
+  emojiButton.addEventListener('click', () => picker.togglePicker(emojiButton));
 
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -19,13 +32,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const messageForm = document.getElementById('message-form');
     const messageInput = document.getElementById('message-input');
 
-
-    // // Autenticar o usuário (substitua 'YOUR_TOKEN_HERE' pelo método correto de obter o token JWT)
-    // socket.emit('authenticate', { token: localStorage.getItem('token') });
-
-    // socket.on('authenticated', () => {
-    //     console.log('User authenticated');
-    // });
     
     socket.emit('joinChannel', {channelId});
 
@@ -121,45 +127,4 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-
-
-    // // Função para exibir mensagens no DOM
-    // function displayMessage(message) {
-    //     const messageElement = document.createElement('div');
-    //     messageElement.textContent = `${message.username}: ${message.text}`;
-    //     messagesContainer.appendChild(messageElement);
-    //     messagesContainer.scrollTop = messagesContainer.scrollHeight; // Scroll para a mensagem mais recente
-    // }
-
-    // // Função para enviar uma nova mensagem
-    // messageForm.addEventListener('submit', function(e) {
-    //     e.preventDefault();
-    //     const messageText = messageInput.value.trim();
-    //     if (messageText) {
-    //         socket.emit('channelMessage', {
-    //             channelId,
-    //             message: {
-    //                 username: username, // Substitua por um método para obter o nome de usuário atual
-    //                 text: messageText,
-    //             }
-    //         });
-    //         messageInput.value = ''; // Limpa o campo de input após enviar
-    //     }
-    // });
-
-    // // Carregar mensagens anteriores (opcional, se você quiser carregar o histórico ao entrar)
-    // function loadMessages() {
-    //     fetch(`/channels/${channelId}/messages`, {
-    //         headers: {
-    //             'Authorization': `Bearer ${localStorage.getItem('token')}`
-    //         }
-    //     })
-    //     .then(response => response.json())
-    //     .then(messages => {
-    //         messages.forEach(displayMessage);
-    //     })
-    //     .catch(error => console.error('Failed to load messages:', error));
-    // }
-
-    // loadMessages();
 });

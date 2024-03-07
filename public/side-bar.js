@@ -181,6 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const userID = localStorage.getItem('userID');
     if (userID) {
         fetchAndDisplayUserRooms(userID);
+        fetchAndDisplayUserChannels(userID);
     }
 });
 
@@ -207,3 +208,182 @@ document.getElementById('toggle-private-chats').addEventListener('click', functi
 //   const deletedRoomId = data.roomId;
 //   document.querySelector(`.room-${deletedRoomId}`).remove();
 //   });
+
+
+
+///////////////////////////////// ÁREA DE CANAIS //////////////////////////////////////
+///////////////////////////////// ÁREA DE CANAIS //////////////////////////////////////
+///////////////////////////////// ÁREA DE CANAIS //////////////////////////////////////
+///////////////////////////////// ÁREA DE CANAIS //////////////////////////////////////
+
+
+document.getElementById('toggle-channels').addEventListener('click', function() {
+  const channelsList = document.getElementById('channels-list-container');
+  const toggleIcon = document.getElementById('toggle-channels');
+
+  // Verifica se a lista está visível
+  if (channelsList.style.display === 'none') {
+      channelsList.style.display = 'block'; // Mostra a lista
+      toggleIcon.textContent = '▼'; // Atualiza o ícone para '▼'
+  } else {
+      channelsList.style.display = 'none'; // Esconde a lista
+      toggleIcon.textContent = '►'; // Atualiza o ícone para '►'
+  }
+});
+
+
+
+// Função para criar o botão de colapso, a lista de participantes e o link para cada sala
+function createChannelElement(channel, currentUserID) {
+  // Criação do elemento da sala
+  const channelElement = document.createElement('div');
+  channelElement.className = 'sidebar-item';
+  channelElement.id = `channel-${channel._id}`;
+
+  const channelLink = document.createElement('a');
+  channelLink.href = `/channel.html?channelId=${channel._id}`;
+  channelLink.textContent = channel.name;
+
+  const collapseButton = document.createElement('button');
+  collapseButton.textContent = '►';
+  collapseButton.className = 'collapse-button';
+  collapseButton.onclick = () => toggleParticipantsChannel(channel._id, collapseButton);
+
+  const participantsList = document.createElement('ul');
+  participantsList.className = 'participants-list';
+  participantsList.style.display = 'none'; // Inicialmente oculto
+
+      // Cria o botão de sair/apagar com base se o usuário é o criador ou não
+      const actionButton = document.createElement('button');
+      actionButton.classList.add('leave-channel-button');
+      if (channel.createdBy === currentUserID) {
+          actionButton.textContent = 'Apagar canal';
+          actionButton.onclick = () => deleteChannel(channel._id);
+      } else {
+          actionButton.textContent = 'Sair do canal';
+          actionButton.onclick = () => leaveChannel(channel._id);
+      }
+
+  channelElement.appendChild(channelLink);
+  channelElement.appendChild(collapseButton);
+  channelElement.appendChild(participantsList);
+  channelElement.appendChild(actionButton);
+
+  return channelElement;
+}
+
+
+// Função para sair da sala
+function leaveChannel(channelId) {
+  fetch(`/channels/${channelId}/leave`, {
+      method: 'POST',
+      headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+  }).then(response => {
+      if (response.ok) {
+          // Remove a sala da barra lateral
+          document.getElementById(`channel-${channelId}`).remove();
+          window.location.href = 'index.html';
+        } else {
+          response.text().then(text => {
+              console.error('Falha ao sair da sala:', text);
+          });
+      }
+  });
+}
+
+
+// Função para apagar sala
+function deleteChannel(channelId) {
+  if (confirm('Tem certeza que deseja apagar este canal?')) {
+      fetch(`/channels/${channelId}`, {
+          method: 'DELETE',
+          headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+      }).then(response => {
+          if (response.ok) {
+            // Remove a sala da barra lateral
+            document.getElementById(`channel-${channelId}`).remove();
+            window.location.href = 'index.html';
+          } else {
+            response.text().then(text => {
+                console.error('Falha ao apagar a sala:', text);
+            });
+        }
+      });
+  }
+}
+
+
+
+  // Função para alternar a visualização dos participantes
+  async function toggleParticipantsChannel(channelId, button) {
+    const participantsList = button.nextElementSibling;
+  
+    if (participantsList.style.display === 'none') {
+      // Buscar participantes e exibir
+      const participants = await fetchParticipantsChannel(channelId);
+      participantsList.innerHTML = ''; // Limpar lista existente
+      participants.forEach(participant => {
+        const participantItem = document.createElement('li');
+        participantItem.textContent = participant.username;
+        participantsList.appendChild(participantItem);
+      });
+      participantsList.style.display = 'block';
+      button.textContent = '▼';
+    } else {
+      // Ocultar lista
+      participantsList.style.display = 'none';
+      button.textContent = '►';
+    }
+  }
+
+
+    // Função para buscar os participantes de uma sala privada
+async function fetchParticipantsChannel(channelId) {
+  // Certifique-se de que o token está sendo enviado no cabeçalho de autorização
+    const token = localStorage.getItem('token');
+    const response = await fetch(`/channels/${channelId}/participants`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+    });
+    if (response.ok) {
+      const participants = await response.json();
+      return participants;
+    } else {
+      console.error('Falha ao buscar participantes:', response.status);
+      return [];
+    }
+  }
+
+
+ // Função para buscar salas privadas do usuário e adicionar à barra lateral
+async function fetchAndDisplayUserChannels(userID) {
+  try {
+      // Certifique-se de que o token está sendo enviado no cabeçalho de autorização
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/channels/user/${userID}`, {
+          headers: {
+              'Authorization': `Bearer ${token}`
+          }
+      });
+
+      if (response.ok) {
+          const channels = await response.json();
+          const channelsListContainer = document.getElementById('channels-list-container');
+          channelsListContainer.innerHTML = ''; // Limpe a lista existente antes de adicionar novas salas
+          channels.forEach(channel => {
+            const channelElement = createChannelElement(channel, userID);
+            channelsListContainer.appendChild(channelElement);
+          });
+        } else {
+          // Lida com a resposta não-OK, como erros de autorização
+          console.error('Não foi possível buscar as salas:', response.status);
+      }
+  } catch (error) {
+      console.error('Erro ao buscar salas:', error);
+  }
+} 

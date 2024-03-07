@@ -251,6 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const messageElement = document.createElement('div');
+        messageElement.classList.add('message-element');
     
         if (data.type === 'info') {
 

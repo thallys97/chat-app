@@ -58,9 +58,16 @@ document.addEventListener('DOMContentLoaded', function() {
           messageContent.appendChild(timestampSpan);
       
     
+          if (message.type === 'gif') {
+            const gifImage = document.createElement('img');
+            gifImage.src = message.text; // A URL do GIF está em message.text
+            gifImage.classList.add('gif-image');
+            messageContent.appendChild(gifImage);
+          } else {
             const textDiv = document.createElement('div');
             textDiv.innerText = message.text;
             messageContent.appendChild(textDiv);
+          }
           
       
           li.appendChild(messageContent);
@@ -95,11 +102,17 @@ document.addEventListener('DOMContentLoaded', function() {
         messageContent.appendChild(timestampSpan);
       
         
+        if (message.type === 'gif') {
+          const gifImage = document.createElement('img');
+          gifImage.src = message.text; // A URL do GIF está em message.text
+          gifImage.classList.add('gif-image');
+          messageContent.appendChild(gifImage);
+        } else {
           const textDiv = document.createElement('div');
           textDiv.innerText = message.text;
           messageContent.appendChild(textDiv);
+        }
 
-      
         li.appendChild(messageContent);
         messagesContainer.appendChild(li);
       
@@ -126,5 +139,86 @@ document.addEventListener('DOMContentLoaded', function() {
                 messageInput.value = ''; // Limpa o campo de input após enviar
             }
         });
+
+
+        //////////////////////////// Channel GIF ////////////////////////////
+        //////////////////////////// Channel GIF ////////////////////////////
+        //////////////////////////// Channel GIF ////////////////////////////
+
+// Função para enviar a mensagem com o GIF
+function sendGifMessageChannel(gifUrl) {
+  socket.emit('channel-message', {
+    channelId,
+    message: {
+      text: gifUrl,
+      userID,
+      username: localStorage.getItem('username'),
+      type: 'gif'
+    }
+  });
+  // Limpa a busca e os resultados do GIF após o envio
+  gifSearchInputChannel.value = '';
+  gifSearchResults.innerHTML = '';
+}
+
+const gifModal = document.getElementById('gif-modal');
+const gifSearchInputChannel = document.getElementById('gif-search-input-channel');
+const gifSearchResults = document.getElementById('gif-search-results');
+const closeModal = document.getElementById('close-modal');
+
+
+// Abre o modal
+document.getElementById('gif-button').addEventListener('click', () => {
+
+  gifModal.style.display = 'block';
+  gifSearchInputChannel.focus();
+});
+
+// Fecha o modal quando clicar em 'x'
+closeModal.onclick = function() {
+  gifModal.style.display = "none";
+}
+
+// Fecha o modal ao clicar fora dele
+window.onclick = function(event) {
+  if (event.target === gifModal) {
+    gifModal.style.display = "none";
+  }
+}
+
+// Pesquisar GIFs enquanto digita
+gifSearchInputChannel.addEventListener('input', () => {
+  const searchTerm = gifSearchInputChannel.value;
+  if (searchTerm.length > 2) { // Evita buscar por strings muito curtas
+      searchGifsChannel(searchTerm);
+  } else {
+    gifSearchResults.innerHTML = ''; // Limpa resultados se a busca for muito curta
+  }
+});
+
+
+  //função para lidar com a busca de GIFs
+  async function searchGifsChannel(query) {
+    const url = `/search-gifs?q=${encodeURIComponent(query)}`;
+  
+    try {
+      const response = await fetch(url);
+      const gifs = await response.json();
+      //const gifResults = document.getElementById('gif-results');
+      gifSearchResults.innerHTML = ''; // Limpa os resultados anteriores
+      gifs.forEach(gif => {
+        const img = document.createElement('img');
+        img.src = gif.images.fixed_height.url;
+        img.addEventListener('click', () => {
+          sendGifMessageChannel(gif.images.fixed_height.url);
+          gifModal.style.display = "none"; // Fecha o modal após a seleção
+        });
+        gifSearchResults.appendChild(img);
+      });
+  
+    } catch (error) {
+      console.error('Erro ao buscar GIFs:', error);
+    }
+  }
 
 });

@@ -145,6 +145,10 @@ body, html {
     margin-top: 16px;
 }
 
+#auth-container {
+    text-align: center;
+}
+
 
 /* Estilização para dispositivos menores */
 @media (max-width: 600px) {

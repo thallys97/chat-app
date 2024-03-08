@@ -76,8 +76,10 @@ async function fetchAndDisplayUsers(searchTerm) {
         resultsContainer.innerHTML = ''; // Limpa resultados anteriores
         users.forEach(user => {
             const userElement = document.createElement('div');
+            userElement.classList.add('user-result');
             userElement.textContent = user.username;
             const addButton = document.createElement('button');
+            addButton.classList.add('add-user-button');
             addButton.textContent = 'Adicionar usuário';
             addButton.addEventListener('click', () => {
                 addUserToParticipantList(user._id, user.username);

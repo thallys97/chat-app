@@ -15,7 +15,111 @@
     background-color: #c8e6c9; /* verde claro 
 } */
 
+
+/* Centraliza o conteúdo da página de criação da sala e aplica estilo */
 #create-room-container {
 
-    margin-left: 250px;
+    /* margin-left: 250px; */
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+
+/* Aumenta o tamanho dos campos de entrada e melhora a interatividade */
+input[type="text"] {
+    width: calc(100% - 20px);
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Estiliza o botão de criar sala */
+#create-room-container button {
+    padding: 10px 20px;
+    margin-top: 20px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    background-color: #28a745;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#create-room-container button:hover {
+    background-color: #218838;
+}
+
+/* Melhora a visualização dos usuários selecionados */
+#selected-users-list {
+    text-align: left;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#selected-users-list div {
+    background-color: #e9e9e9;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    padding: 5px;
+}
+
+/* Adiciona estilo ao botão de limpar resultados */
+.clear-results {
+    background-color: #dc3545;
+    color: white;
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin-top: 10px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.clear-results:hover {
+    background-color: #c82333;
+}
+
+.user-result {
+
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    font-weight: bold;
+
+}
+
+#create-room-container .add-user-button {
+
+    margin: 0px;
+
+}
+
+
+/* Responsividade: Ajusta estilos para telas menores */
+@media (max-width: 768px) {
+    #create-room-container {
+        margin: 20px;
+        padding: 20px;
+    }
+    input[type="text"] {
+        width: calc(100% - 16px); /* Ajuste para margens internas menores */
+    }
 }

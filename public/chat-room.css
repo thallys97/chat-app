@@ -1,35 +1,123 @@
 
-#chat-container {
-    margin-left: 250px;
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f3f4f6; /* Um fundo suave */
+  margin: 0;
+  padding: 0;
 }
+
+
+#chat-container {
+  max-width: 800px;
+  margin: 0 auto; /* Centraliza o container */
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* #messages {
+    list-style-type: none; /* Remove os bullet points 
+    padding: 0; /* Remove o padding padrão
+} */
 
 #messages {
-    list-style-type: none; /* Remove os bullet points */
-    padding: 0; /* Remove o padding padrão */
+  overflow-y: auto;
+  padding: 20px;
+  margin-bottom: 20px;
+  flex-grow: 1;
+  list-style-type: none;
 }
 
-.message-content {
+
+
+/* .message-content {
     background-color: #f9f9f9;
     padding: 10px;
     border-radius: 10px;
     margin-bottom: 10px;
     display: flex;
     flex-direction: column;
+} */
+
+.message-content {
+  background-color: #e7eff9;
+  padding: 10px 15px;
+  border-radius: 15px;
+  margin-bottom: 10px;
+  max-width: 75%;
+  word-break: break-word;
 }
+
 
 .message-username {
     font-weight: bold;
+    color: #4a5568;
+    margin-right: 1rem;
 }
 
-.message-timestamp {
+/* .message-timestamp {
     color: #999;
     font-size: 0.8em;
     margin-top: 5px;
+} */
+
+.message-timestamp {
+  color: #a0aec0;
+  font-size: 0.8em;
+  text-align: right;
 }
 
-.message-text {
+/* .message-text {
   white-space: normal;
   overflow-wrap: break-word;
+} */
+
+.message-text {
+  color: #2d3748;
+  padding-top: 5px;
+}
+
+#message-input {
+  padding: 10px;
+  border: 1px solid #cbd5e0;
+  border-radius: 20px;
+  resize: none;
+}
+
+.button-emoji-gifs {
+    display: flex;
+}
+
+
+#send-button,
+#emoji-button,
+#gif-button {
+    background-color: #4c51bf;
+    color: #fff;
+    padding: 8px 16px;
+    margin: 0 8px;
+    margin-top: 8px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    width: 20%;
+}
+
+#send-button:hover,
+#emoji-button:hover,
+#gif-button:hover {
+    background-color: #434190;
+}
+
+#send-button:active,
+#emoji-button:active,
+#gif-button:active {
+    transform: scale(0.98);
 }
 
 

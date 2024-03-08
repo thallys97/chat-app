@@ -61,14 +61,16 @@
   </ul>
     <form id="message-form">
         <textarea type="text" id="message-input" placeholder="Escreva sua mensagem aqui..." rows="5" cols="50"></textarea>
-        <div>
-          <input type="file" id="file-input" accept="image/*, video/*" /> <!-- Input para arquivos -->
-          <small id="file-size-info">Tamanho máximo: 20 MB</small>
+        <div id="action-buttons">
+          <div>
+            <input type="file" id="file-input" accept="image/*, video/*" /> <!-- Input para arquivos -->
+            <small id="file-size-info">Tamanho máximo: 20 MB</small>
+          </div>
+          <button type="button" class="button" id="emoji-button">😊</button>
+          <button type="button" id="gif-button">Buscar GIF</button>
         </div>
-        <button type="submit">Enviar</button>
+        <button id="send-button" type="submit">Enviar</button>
     </form>
-    <button class="button" id="emoji-button">😊</button>
-    <button id="gif-button">Buscar GIF</button> 
 </div>
 
 <div id="gif-modal" class="modal">

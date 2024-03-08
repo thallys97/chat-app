@@ -1,7 +1,8 @@
 body, html {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #F7F9FB;
 }
 
 /* #app-container {
@@ -50,12 +51,17 @@ body, html {
     margin-bottom: 10px;
   }
 
-#chat-container {
-    max-width: 600px;
-    margin: 20px auto;
-    border: 1px solid #ddd;
+  #chat-container {
+    max-width: 800px;
+    margin: 50px auto 25px auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     padding: 20px;
-    margin-left: 250px; /* Ajuste este valor conforme a largura da sua barra lateral */
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 #logout-btn {
@@ -64,24 +70,27 @@ body, html {
 
 #messages {
     margin-bottom: 20px;
-    height: 300px;
+    height: 500px;
     overflow-y: auto;
-    border: 1px solid #ccc;
-    padding: 10px;
+    border: none;
+    padding: 15px;
+    background: #F0F2F5;
+    border-radius: 8px;
 }
 
+
 #message-form {
-    display: none;
-    /* justify-content: space-between; */
-    padding-top: 10px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
 }
 
 #message-input {
-    flex-grow: 1; /* Permite que o input ocupe o máximo de espaço disponível */
-    margin-right: 10px; /* Espaço entre o input e o botão de enviar */
+    flex-grow: 1;
     padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px; /* Borda arredondada para o input */
+    border: 2px solid #E0E0E0;
+    border-radius: 20px;
+    outline: none;
 }
 
 #file-size-info {
@@ -93,23 +102,24 @@ body, html {
 
 
 .button {
+    background-color: #5C7AEA;
+    color: white;
     padding: 10px 15px;
     border: none;
-    background-color: #007bff;
-    color: white;
+    border-radius: 20px;
     cursor: pointer;
-    border-radius: 4px; /* Borda arredondada para o botão */
-    transition: background-color 0.3s; /* Transição suave para o hover */
+    transition: background-color 0.3s;
+    text-transform: uppercase;
+    font-weight: bold;
 }
 
 .button:hover {
-    background-color: #0056b3;
+    background-color: #4055A8;
 }
 
 .button-index-send {
-
-    height: 2rem;
-
+    height: auto;
+    white-space: nowrap;
 }
 
 #username {
@@ -125,6 +135,11 @@ body, html {
     border: none;
     background-color: transparent;
     font-size: 24px;
+    transition: transform 0.3s;
+}
+
+#emoji-button:hover {
+    transform: scale(1.2);
 }
 
 #user-search-container {
@@ -147,6 +162,7 @@ body, html {
 
 #auth-container {
     text-align: center;
+    margin-bottom: 50px;
 }
 
 

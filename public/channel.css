@@ -1,11 +1,31 @@
-#channel-container {
+/* #channel-container {
 
     margin-left: 250px;
+} */
+
+
+#channel-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-height: 80vh;
 }
 
+/* #messages-container {
+  list-style-type: none; /* Remove os bullet points 
+  padding: 0; /* Remove o padding padrão 
+} */
+
 #messages-container {
-  list-style-type: none; /* Remove os bullet points */
-  padding: 0; /* Remove o padding padrão */
+  overflow-y: auto;
+  margin-bottom: 10px;
+  flex-grow: 1;
+  list-style-type: none;
 }
 
 .message-content {
@@ -31,6 +51,66 @@
   white-space: normal;
   overflow-wrap: break-word;
 }
+
+/* Novos estilos para botões e área de entrada de mensagem */
+#message-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+#message-input {
+  flex-grow: 1;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #cbd5e0;
+  border-radius: 20px;
+  resize: none;
+  width: calc(100% - 20px); /* Considerar padding */
+}
+
+/* Grupo de botões de ação */
+#action-buttons {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+}
+
+#file-input {
+  margin-bottom: 10px;
+}
+
+
+.button {
+  background-color: #4c51bf;
+  color: #fff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.button:hover {
+  background-color: #434190;
+}
+
+/* Aplica estilo aos botões de emoji e gif para alinhá-los ao lado do campo de texto */
+#emoji-button,
+#gif-button {
+  padding: 6px 12px; /* Menor que o botão enviar */
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+#send-button {
+  padding: 8px 16px;
+  margin-bottom: 0; /* Não precisa de margem na parte inferior */
+  cursor: pointer;
+}
+
 
 
 .modal {
@@ -82,4 +162,25 @@
 .message-file {
   width: 90%;
   
+}
+
+
+/* Responsividade */
+@media (max-width: 600px) {
+  #message-form {
+      flex-direction: column;
+  }
+
+  #action-buttons {
+      flex-direction: column;
+      align-items: stretch;
+  }
+
+  #emoji-button,
+  #gif-button,
+  #send-button {
+      width: 100%; /* Faz com que os botões preencham a largura disponível */
+      margin-right: 0; /* Não é necessário margem à direita em dispositivos móveis */
+      margin-bottom: 10px;
+  }
 }

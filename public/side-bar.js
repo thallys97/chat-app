@@ -35,6 +35,7 @@ function createRoomElement(room, currentUserID) {
     const roomLink = document.createElement('a');
     roomLink.href = `/chat-room.html?roomId=${room._id}`;
     roomLink.textContent = room.name;
+    roomLink.classList.add('sidebar-item-text')
   
     const collapseButton = document.createElement('button');
     collapseButton.textContent = '►';
@@ -292,6 +293,7 @@ function createChannelElement(channel, currentUserID) {
   const channelLink = document.createElement('a');
   channelLink.href = `/channel.html?channelId=${channel._id}`;
   channelLink.textContent = channel.name;
+  channelLink.classList.add('sidebar-item-text');
 
   const collapseButton = document.createElement('button');
   collapseButton.textContent = '►';

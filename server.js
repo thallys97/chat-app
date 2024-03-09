@@ -19,12 +19,32 @@ require('dotenv').config();
 
 const app = express();
 const server = http.createServer(app);
+const PORT = process.env.PORT || 3000;
 const io = socketIo(server);
 
-// Substitua 'your_mongodb_connection_string' pela sua string de conexão do MongoDB
-mongoose.connect('mongodb://localhost:27017/messages');
 
-const PORT = 3000;
+mongoose.set('strictQuery', false);
+
+// // Substitua 'your_mongodb_connection_string' pela sua string de conexão do MongoDB
+// mongoose.connect('mongodb://localhost:27017/messages');
+
+const connectDB = async () => {
+    try {
+        const conn = await mongoose.connect(process.env.MONGO_URI);
+        console.log(`MongoDB Connected: ${conn.connection.host}`);
+    } catch (error) {
+        console.error(error);
+        process.exit(1);
+        
+    }
+}
+
+
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    })
+})
 
 const withAuth = (req, res, next) => {
     try {

@@ -33,7 +33,7 @@ const connectDB = async () => {
         const conn = await mongoose.connect(process.env.MONGO_URI);
         console.log(`MongoDB Connected: ${conn.connection.host}`);
     } catch (error) {
-        console.error(error);
+        console.error("connect failed: " + error.message);
         process.exit(1);
         
     }
@@ -41,7 +41,7 @@ const connectDB = async () => {
 
 
 connectDB().then(() => {
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
     })
 })
@@ -780,7 +780,7 @@ io.on('connection', async (socket) => {
 
 });
 
-server.listen(PORT, () => {
-    console.log(`Servidor rodando em http://localhost:${PORT}`);
-});
+// server.listen(PORT, () => {
+//     console.log(`Servidor rodando em http://localhost:${PORT}`);
+// });
 

@@ -8,13 +8,14 @@
     height: calc(100% - 60px); /* Altura subtraindo a altura do menu superior */
     overflow-y: auto; /* Adiciona rolagem vertical se o conteúdo for muito longo */
     background-color: #f4f4f4;
-    border-right: 1px solid #ddd;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    border-right: 1px solid #ececec;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.05);
     padding: 10px;
     box-sizing: border-box; /* Isso garante que o padding seja incluído na largura */
+    z-index: 1000; /* Ensure it's above other content */
   }
 
-  #toggle-sidebar {
+ #toggle-sidebar {
     display: block;
     width: 50px;
     padding: 10px;
@@ -24,29 +25,48 @@
     border: none;
     cursor: pointer;
     color: black;
-}
+} 
 
   
-  .sidebar-item {
+  /* .sidebar-item {
     padding: 10px;
     border-bottom: 1px solid #ddd;
     cursor: pointer;
-  }
-  
-  .sidebar-item:hover {
-    background-color: #e9e9e9;
-  }
+  } */
 
-  .sidebar-item.active {
-    background-color: #3e3e3e; /* ou qualquer cor de destaque que você preferir */
-    color: white;
+  .sidebar-item {
+    padding: 12px 16px;
+    font-size: 16px; /* Larger font size */
+    border-bottom: 1px solid #ececec;
+    color: #333; /* Dark grey color for text */
+    transition: background-color 0.3s, color 0.3s;
 }
 
+
+.sidebar-item:hover {
+  background-color: #e9e9e9;
+}
+
+.sidebar-item.active {
+  background-color: #3e3e3e; /* ou qualquer cor de destaque que você preferir */
+  color: white;
+}
+
+.sidebar-item-text {
+  text-decoration: none;
+  color: #000;
+  font-size: 18px;
+}
   
-  .sidebar-title {
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
+.sidebar-title {
+  padding: 12px 16px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  background-color: #f9f9f9; /* Slightly grey background */
+  margin: 0; /* Reset margins */
+  border-bottom: 1px solid #ececec;
+}
 
   .button {
     padding: 10px 15px;
@@ -65,8 +85,10 @@
 
 /* Estilo para o botão de colapsar/expandir */
 .collapse-toggle {
+  font-size: 12px; /* Smaller icon */
+  color: #5C7AEA; /* Theme color */
   cursor: pointer;
-  padding-right: 5px;
+  float: right; /* Align to the right */
 }
 
 /* Estilo para a lista de chats privados */
@@ -102,6 +124,47 @@
 
   display: block;
   cursor: pointer;
-  margin-top: 5px;
+  margin-top: 10px;
+  
+}
+
+.leave-channel-button {
+
+  cursor: pointer;
+  margin-top: 10px;
+  
+}
+
+#toggle-private-chats {
+  font-size: 18px; 
+}
+
+#toggle-channels {
+  font-size: 18px; 
+}
+
+@media screen and (max-width: 600px) {
+
+
+  .sidebar-item-text {
+    text-decoration: none;
+    color: #000;
+    font-size: 22px;
+  }
+
+  .leave-room-button {
+
+    display: block;
+    cursor: pointer;
+    margin-top: 20px;
+    
+  }
+  
+  .leave-channel-button {
+  
+    cursor: pointer;
+    margin-top: 20px;
+    
+  }
   
 }

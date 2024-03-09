@@ -163,3 +163,14 @@ body {
     width: 150px;
   }
   
+
+
+@media screen and (max-width: 600px) {
+
+  .message-text {
+    color: #2d3748;
+    padding-top: 5px;
+    font-size: 1.2rem;
+  }
+  
+}  

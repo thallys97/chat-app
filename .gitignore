@@ -1,6 +1,5 @@
 node_modules/
 .vscode/
-uploads/
 CombineFilesContent.ps1
 scripts/
 .env

@@ -23,6 +23,14 @@ document.getElementById('search-channel-form').addEventListener('submit', functi
     })
         .then(response => response.json())
         .then(data => {
+
+            if (data.length === 0) {
+                const noResults = document.createElement('p');
+                noResults.textContent = 'Nenhum canal encontrado.';
+                resultsContainer.appendChild(noResults);
+                return;
+            }
+
             data.forEach(channel => {
                 const channelResult = document.createElement('div');
                 channelResult.className = 'channel-result';

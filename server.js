@@ -11,6 +11,10 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const Room = require('./roomModel');
 const Channel = require('./channelModel');
+const stream = require('stream');
+
+
+const cloudinary = require('cloudinary').v2;
 
 const { Console } = require('console');
 
@@ -22,6 +26,11 @@ const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
 const io = socketIo(server);
 
+cloudinary.config({ 
+  cloud_name: process.env.CLOUD_NAME, 
+  api_key: process.env.API_KEY, 
+  api_secret: process.env.API_SECRET 
+});
 
 mongoose.set('strictQuery', false);
 
@@ -212,34 +221,64 @@ app.use('/protected-route', withAuth, (req, res) => {
 
 
 
-// Configure o Multer e o local de armazenamento dos arquivos
-const storage = multer.diskStorage({
-    destination: function(req, file, cb) {
-        cb(null, 'uploads/'); // Certifique-se de que este diretório exista
-    },
-    filename: function(req, file, cb) {
-        cb(null, Date.now() + path.extname(file.originalname)); // Nomeando o arquivo
-    }
-});
+// // Configure o Multer e o local de armazenamento dos arquivos
+// const storage = multer.diskStorage({
+//     destination: function(req, file, cb) {
+//         cb(null, 'uploads/'); // Certifique-se de que este diretório exista
+//     },
+//     filename: function(req, file, cb) {
+//         cb(null, Date.now() + path.extname(file.originalname)); // Nomeando o arquivo
+//     }
+// });
 
 const upload = multer({ 
-    storage: storage,
+    storage: multer.memoryStorage(),
     limits: { fileSize: 20 * 1024 * 1024 } // 20 MB
 });
 
 
+// // Rota de upload
+// app.post('/upload', upload.single('file'), (req, res) => {
+//     if (req.file) {
+//         const url = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+//         res.json({ url: url });
+//     } else {
+//         res.status(400).send('Nenhum arquivo foi enviado.');
+//     }
+// });
+
 // Rota de upload
-app.post('/upload', upload.single('file'), (req, res) => {
-    if (req.file) {
-        const url = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
-        res.json({ url: url });
-    } else {
-        res.status(400).send('Nenhum arquivo foi enviado.');
+app.post('/upload', upload.single('file'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).send({ message: 'Nenhum arquivo enviado.' });
+        }
+
+        // Como estamos usando memoryStorage, o arquivo é armazenado em req.file.buffer
+        const result = await cloudinary.uploader.upload_stream({
+            resource_type: 'auto'
+        }, (error, result) => {
+            if (error) {
+                console.error('Erro no Cloudinary:', error);
+                res.status(500).send('Erro ao fazer upload do arquivo.');
+            } else {
+                res.json({ url: result.secure_url });
+            }
+        });
+
+        // Vamos usar o buffer diretamente
+        const bufferStream = new stream.PassThrough();
+        bufferStream.end(req.file.buffer);
+        bufferStream.pipe(result);
+    } catch (error) {
+        console.error('Erro ao fazer upload:', error);
+        res.status(500).send('Erro ao fazer upload do arquivo.');
     }
 });
 
-// Servir arquivos estáticos da pasta uploads
-app.use('/uploads', express.static('uploads'));
+
+// // Servir arquivos estáticos da pasta uploads
+// app.use('/uploads', express.static('uploads'));
 
 
 app.get('/users', withAuth, async (req, res) => {

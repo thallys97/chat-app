@@ -99,7 +99,7 @@ app.post('/register', async (req, res) => {
 
         // Loga o usuário e retorna um token
         // const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
-        const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET);
+        const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
         res.json({ token, userID: user._id }); // Envia o token para o cliente
 
         // Emita uma mensagem de boas-vindas no chat
@@ -135,7 +135,7 @@ app.post('/login', async (req, res) => {
         }
 
         // const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
-        const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET);
+        const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
         res.json({ token, userID: user._id }); // Envie o token como JSON
 
         // Emita uma mensagem no chat indicando que o usuário entrou

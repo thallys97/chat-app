@@ -1,3 +1,12 @@
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 document.getElementById('search-channel-form').addEventListener('submit', function(e) {
     e.preventDefault();
 
@@ -34,7 +43,7 @@ document.getElementById('search-channel-form').addEventListener('submit', functi
             data.forEach(channel => {
                 const channelResult = document.createElement('div');
                 channelResult.className = 'channel-result';
-                channelResult.innerHTML = `<strong>${channel.name}</strong> - ${channel.topic} - <span>Participantes: ${channel.participants.length}</span>`;
+                channelResult.innerHTML = `<strong>${escapeHtml(channel.name)}</strong> - ${escapeHtml(channel.topic)} - <span>Participantes: ${channel.participants.length}</span>`;
                 channelResult.style.cursor = 'pointer';
                 channelResult.addEventListener('click', () => joinChannel(channel._id)); // Implemente joinChannel conforme necessário
                 resultsContainer.appendChild(channelResult);

@@ -194,11 +194,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
         // Função para verificar se a mensagem contém um link e transformá-lo em um elemento clicável
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
     function createLinkElement(text) {
       // Regex para identificar URLs na mensagem
-      const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+      const urlRegex = /(\b(https?):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
       // Substitui todas as ocorrências de URLs por um elemento âncora
-      return text.replace(urlRegex, function(url) {
+      return escapeHtml(text).replace(urlRegex, function(url) {
           return `<a href="${url}" target="_blank">${url}</a>`;
       });
   }

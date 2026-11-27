@@ -232,11 +232,20 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Função para verificar se a mensagem contém um link e transformá-lo em um elemento clicável
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
     function createLinkElement(text) {
         // Regex para identificar URLs na mensagem
-        const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+        const urlRegex = /(\b(https?):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
         // Substitui todas as ocorrências de URLs por um elemento âncora
-        return text.replace(urlRegex, function(url) {
+        return escapeHtml(text).replace(urlRegex, function(url) {
             return `<a href="${url}" target="_blank">${url}</a>`;
         });
     }
@@ -259,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Estiliza e exibe mensagens do sistema
             const infoElement = document.createElement('p');
-            infoElement.innerHTML = `<em>${data.text}</em>`;
+            infoElement.innerHTML = `<em>${escapeHtml(data.text)}</em>`;
             infoElement.style.color = 'grey';
             messageElement.appendChild(infoElement);
             
@@ -307,7 +316,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const messageWithLink = createLinkElement(data.text);
 
              // Exibir mensagem de texto
-            messageElement.innerHTML = `${data.username}: ${messageWithLink}`;
+            messageElement.innerHTML = `${escapeHtml(data.username)}: ${messageWithLink}`;
         }
     
         messagesContainer.appendChild(messageElement);
